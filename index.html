@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, touch-action=manipulation">
-  <title>!Hill Climb Racing - Гараж и прокачка</title>
+  <title>Hill Climb Racing - Гараж и прокачка</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -25,8 +25,27 @@
       border-radius: 6px;
       overflow: hidden;
       border: 3px solid #ff4400;
+      position: relative;
     }
     canvas { display: block; max-width: 100%; height: auto; }
+    .fullscreen-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.7);
+      color: #fff;
+      border: 1px solid #ff4400;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      z-index: 10;
+      transition: all 0.3s;
+    }
+    .fullscreen-btn:hover {
+      background: #ff4400;
+      color: #000;
+    }
     .menu-bar {
       display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
       color: #ffaa00; font-weight: bold; font-size: 0.85rem;
@@ -59,16 +78,104 @@
     .info { text-align: center; color: #ff4400; font-weight: bold; font-size: 0.75rem; }
     .controls-panel { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; color: #666; font-size: 0.55rem; }
     .controls-panel span { background: #0a0a0a; padding: 2px 6px; border-radius: 6px; border: 1px solid #222; }
-    .touch-controls { display: none; gap: 3px; margin-top: 2px; justify-content: center; }
-    .touch-btn {
-      width: 40px; height: 40px; background: rgba(255,100,0,0.2);
-      border: 2px solid rgba(255,100,0,0.6); border-radius: 6px;
-      color: #ff4400; font-size: 16px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; touch-action: manipulation; user-select: none;
+    
+    /* УЛУЧШЕННЫЕ СЕНСОРНЫЕ КНОПКИ */
+    .touch-controls { 
+      display: none; 
+      position: fixed;
+      bottom: 20px;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      pointer-events: none;
     }
-    .touch-btn:active { background: rgba(255,100,0,0.6); }
-    .touch-row { display: flex; gap: 3px; }
+    .touch-controls-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding: 0 15px;
+      max-width: 800px;
+      margin: 0 auto;
+      pointer-events: none;
+    }
+    .touch-pedal-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: auto;
+    }
+    .touch-pedal {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 3px solid rgba(255,255,255,0.4);
+      background: rgba(0,0,0,0.5);
+      color: #fff;
+      font-size: 28px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: all 0.1s;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      backdrop-filter: blur(5px);
+    }
+    .touch-pedal:active {
+      background: rgba(255,100,0,0.7);
+      border-color: #ff4400;
+      transform: scale(0.92);
+      box-shadow: 0 2px 8px rgba(255,100,0,0.5);
+    }
+    .touch-pedal.gas {
+      border-color: rgba(0,255,0,0.5);
+    }
+    .touch-pedal.gas:active {
+      background: rgba(0,200,0,0.7);
+      border-color: #00ff00;
+      box-shadow: 0 2px 8px rgba(0,255,0,0.5);
+    }
+    .touch-pedal.brake {
+      border-color: rgba(255,0,0,0.5);
+    }
+    .touch-pedal.brake:active {
+      background: rgba(200,0,0,0.7);
+      border-color: #ff0000;
+      box-shadow: 0 2px 8px rgba(255,0,0,0.5);
+    }
+    .touch-tilt-group {
+      display: flex;
+      gap: 10px;
+      pointer-events: auto;
+    }
+    .touch-tilt-btn {
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      border: 2px solid rgba(255,255,255,0.3);
+      background: rgba(0,0,0,0.5);
+      color: #fff;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: all 0.1s;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+      backdrop-filter: blur(5px);
+    }
+    .touch-tilt-btn:active {
+      background: rgba(255,150,0,0.7);
+      border-color: #ffaa00;
+      transform: scale(0.9);
+    }
+    
     .overlay {
       display: none; position: fixed; top: 0; left: 0;
       width: 100%; height: 100%; background: rgba(0,0,0,0.95);
@@ -187,8 +294,36 @@
       transition: opacity 0.3s;
     }
     .save-indicator.show { opacity: 1; }
+    
+    /* Полноэкранный режим */
+    .game-wrapper.fullscreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 9999;
+      border: none;
+      border-radius: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+    }
+    .game-wrapper.fullscreen canvas {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .game-wrapper.fullscreen .fullscreen-btn {
+      top: 20px;
+      right: 20px;
+      font-size: 1rem;
+      padding: 8px 15px;
+    }
+    
     @media (max-width: 768px) {
-      .touch-controls { display: flex; flex-direction: column; align-items: center; }
+      .touch-controls { display: block; }
       .cars-row { gap: 8px; }
       .car-card { width: 140px; padding: 10px; }
       .car-icon { font-size: 2.5rem; }
@@ -198,24 +333,31 @@
 <body>
 <div class="game-container">
   <div class="menu-bar">
-    🏆 МММонет: <span id="totalCoinsDisplay">0</span>
+    🏆 Монет: <span id="totalCoinsDisplay">0</span>
     🚗 <span id="currentCarDisplay">Джип</span>
     <button class="garage-btn" id="openGarageBtn">🔧 ГАРАЖ</button>
     <button class="reset-btn" id="resetProgressBtn" title="Сбросить весь прогресс">🗑️ Сброс</button>
     <span class="save-indicator" id="saveIndicator">💾 Сохранено</span>
   </div>
   <div class="level-select" id="levelButtons"></div>
-  <div class="game-wrapper"><canvas id="gameCanvas" width="900" height="500"></canvas></div>
-  <div class="info" id="infoDisplay">🏔️ HILL CLIMB RACING | Уровень: <span id="levelDisplay">1</span> | Скорость: <span id="speedDisplay">0</span> | Топливо: <span id="fuelDisplay">100</span>%</div>
-  <div class="controls-panel"><span>→ газ</span><span>← тормоз</span><span>↑↓ наклон в воздухе</span><span>R рестарт</span></div>
+  <div class="game-wrapper" id="gameWrapper">
+    <button class="fullscreen-btn" id="fullscreenBtn" title="Полноэкранный режим">⛶</button>
+    <canvas id="gameCanvas" width="900" height="500"></canvas>
+  </div>
+  <div class="info" id="infoDisplay">🏔️ HILL CLIMB RACING | Уровень: <span id="levelDisplay">1</span> | Скорость: <span id="speedDisplay">0</span> км/ч | Топливо: <span id="fuelDisplay">100</span>%</div>
+  <div class="controls-panel" id="desktopControls"><span>→ газ</span><span>← тормоз</span><span>↑↓ наклон в воздухе</span><span>R рестарт</span><span>F фулскрин</span></div>
   <div class="touch-controls" id="touchControls">
-    <div class="touch-row">
-      <button class="touch-btn" id="btnBrake">◀</button>
-      <button class="touch-btn" id="btnGas">▶</button>
-    </div>
-    <div class="touch-row">
-      <button class="touch-btn" id="btnTiltUp">▲</button>
-      <button class="touch-btn" id="btnTiltDown">▼</button>
+    <div class="touch-controls-inner">
+      <div class="touch-pedal-group">
+        <button class="touch-pedal brake" id="btnBrake">◀</button>
+      </div>
+      <div class="touch-tilt-group">
+        <button class="touch-tilt-btn" id="btnTiltUp">▲</button>
+        <button class="touch-tilt-btn" id="btnTiltDown">▼</button>
+      </div>
+      <div class="touch-pedal-group">
+        <button class="touch-pedal gas" id="btnGas">▶</button>
+      </div>
     </div>
   </div>
 </div>
@@ -254,12 +396,19 @@
   const canvas = document.getElementById('gameCanvas');
   const ctx = canvas.getContext('2d');
   const W=900, H=500;
-  const GRAVITY=0.5;
+  
+  const GRAVITY=0.65;
+  
   const keys={};
   let cameraX=0, gameOver=false, outOfFuel=false, levelComplete=false, distance=0, coins=0, totalCoins=0;
   let currentLevel=1, isEndless=false, finishLineX=999999, fuel=100, gameStarted=false, airTime=0, maxAirTime=0, generatedTerrainLength=0;
   let currentCarIndex=0;
   let saveTimeout = null;
+  let isFullscreen = false;
+
+  // Определение мобильного устройства
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                   (navigator.maxTouchPoints > 1 && window.innerWidth < 1024);
 
   // ===== СИСТЕМА МАШИН И ПРОКАЧКИ =====
   const carsConfig = [
@@ -268,9 +417,9 @@
       color: '#ff3300', unlocked: true,
       maxUpgrades: { engine: 4, tires: 4, fuel: 4 },
       upgradeCosts: {
-        engine: [0, 100, 300, 800, 2000],
-        tires: [0, 80, 250, 700, 1800],
-        fuel: [0, 60, 200, 600, 1500]
+        engine: [0, 30, 80, 200, 500],
+        tires: [0, 25, 70, 180, 450],
+        fuel: [0, 20, 60, 150, 400]
       },
       stats: { engine: 1.0, tires: 1.0, fuel: 1.0 },
       upgradeLevels: { engine: 0, tires: 0, fuel: 0 }
@@ -280,9 +429,9 @@
       color: '#00aa00', unlocked: false,
       maxUpgrades: { engine: 5, tires: 5, fuel: 5 },
       upgradeCosts: {
-        engine: [0, 200, 500, 1200, 3000, 6000],
-        tires: [0, 180, 450, 1000, 2500, 5000],
-        fuel: [0, 150, 400, 900, 2200, 4500]
+        engine: [0, 60, 150, 350, 800, 1500],
+        tires: [0, 50, 130, 300, 700, 1300],
+        fuel: [0, 45, 120, 280, 650, 1200]
       },
       stats: { engine: 1.3, tires: 1.4, fuel: 1.2 },
       upgradeLevels: { engine: 0, tires: 0, fuel: 0 }
@@ -292,16 +441,16 @@
       color: '#ffdd00', unlocked: false,
       maxUpgrades: { engine: 6, tires: 6, fuel: 6 },
       upgradeCosts: {
-        engine: [0, 400, 1000, 2500, 5000, 10000, 20000],
-        tires: [0, 350, 900, 2200, 4500, 9000, 18000],
-        fuel: [0, 300, 800, 2000, 4000, 8000, 16000]
+        engine: [0, 120, 300, 700, 1500, 3000, 6000],
+        tires: [0, 100, 260, 600, 1300, 2600, 5200],
+        fuel: [0, 90, 240, 550, 1200, 2400, 4800]
       },
       stats: { engine: 1.6, tires: 1.5, fuel: 1.4 },
       upgradeLevels: { engine: 0, tires: 0, fuel: 0 }
     }
   ];
 
-  // ===== УЛУЧШЕННАЯ СИСТЕМА СОХРАНЕНИЯ =====
+  // ===== СИСТЕМА СОХРАНЕНИЯ =====
   function showSaveIndicator(elementId) {
     const indicator = document.getElementById(elementId);
     if (indicator) {
@@ -311,7 +460,6 @@
   }
 
   function saveGameData(immediate = false) {
-    // Если не срочно, откладываем сохранение
     if (!immediate && saveTimeout) {
       clearTimeout(saveTimeout);
     }
@@ -333,31 +481,18 @@
           upgradeLevels: c.upgradeLevels
         })),
         timestamp: Date.now(),
-        version: '1.1'
+        version: '1.9'
       };
      
       const jsonData = JSON.stringify(data);
       localStorage.setItem('hcr_garage', jsonData);
      
-      // Показываем индикатор сохранения
       showSaveIndicator('saveIndicator');
       showSaveIndicator('garageSaveIndicator');
-     
-      console.log('✅ Прогресс сохранён:', {
-        монеты: totalCoins,
-        машина: carsConfig[currentCarIndex].name,
-        время: new Date().toLocaleString()
-      });
      
       return true;
     } catch(e) {
       console.error('❌ Ошибка сохранения:', e);
-     
-      // Если localStorage переполнен
-      if (e.name === 'QuotaExceededError') {
-        alert('Хранилище браузера переполнено! Очистите данные других сайтов.');
-      }
-     
       return false;
     }
   }
@@ -368,17 +503,14 @@
       if (saved) {
         const data = JSON.parse(saved);
        
-        // Загружаем монеты
         if (typeof data.totalCoins === 'number' && data.totalCoins >= 0) {
           totalCoins = data.totalCoins;
         }
        
-        // Загружаем выбранную машину
         if (typeof data.currentCarIndex === 'number' && data.currentCarIndex >= 0 && data.currentCarIndex < carsConfig.length) {
           currentCarIndex = data.currentCarIndex;
         }
        
-        // Загружаем состояние машин
         if (data.cars && Array.isArray(data.cars)) {
           data.cars.forEach((savedCar, index) => {
             if (carsConfig[index] && savedCar) {
@@ -391,74 +523,45 @@
                   tires: savedCar.upgradeLevels.tires || 0,
                   fuel: savedCar.upgradeLevels.fuel || 0
                 };
-                // Пересчитываем статы
                 recalculateCarStats(index);
               }
             }
           });
         }
        
-        // Проверяем разблокировку следующих машин
         checkAndUnlockNextCar();
-       
-        console.log('✅ Прогресс загружен:', {
-          монеты: totalCoins,
-          машина: carsConfig[currentCarIndex].name,
-          сохранение_от: data.timestamp ? new Date(data.timestamp).toLocaleString() : 'неизвестно'
-        });
-       
         return true;
-      } else {
-        console.log('ℹ️ Сохранений не найдено, начинаем новую игру');
-        return false;
       }
+      return false;
     } catch(e) {
       console.error('❌ Ошибка загрузки:', e);
-     
-      // Если данные повреждены, удаляем их
-      if (e.name === 'SyntaxError') {
-        console.warn('⚠️ Данные повреждены, сбрасываем прогресс');
-        localStorage.removeItem('hcr_garage');
-        alert('Данные сохранения были повреждены. Прогресс сброшен.');
-      }
-     
       return false;
     }
   }
 
   function recalculateCarStats(carIndex) {
     const car = carsConfig[carIndex];
-    car.stats.engine = 1.0 + (car.upgradeLevels.engine * 0.25 * (1 + carIndex * 0.3));
-    car.stats.tires = 1.0 + (car.upgradeLevels.tires * 0.25 * (1 + carIndex * 0.3));
-    car.stats.fuel = 1.0 + (car.upgradeLevels.fuel * 0.25 * (1 + carIndex * 0.3));
+    car.stats.engine = 1.0 + (car.upgradeLevels.engine * 0.2 * (1 + carIndex * 0.25));
+    car.stats.tires = 1.0 + (car.upgradeLevels.tires * 0.2 * (1 + carIndex * 0.25));
+    car.stats.fuel = 1.0 + (car.upgradeLevels.fuel * 0.2 * (1 + carIndex * 0.25));
   }
 
   function resetAllProgress() {
-    // Сбрасываем всё
     totalCoins = 0;
     currentCarIndex = 0;
    
     carsConfig.forEach((car, index) => {
-      car.unlocked = (index === 0); // Только первая машина доступна
+      car.unlocked = (index === 0);
       car.upgradeLevels = { engine: 0, tires: 0, fuel: 0 };
-      car.stats = {
-        engine: 1.0,
-        tires: 1.0,
-        fuel: 1.0
-      };
+      car.stats = { engine: 1.0, tires: 1.0, fuel: 1.0 };
     });
    
-    // Удаляем сохранения
     localStorage.removeItem('hcr_garage');
-   
-    // Обновляем всё
     resetCar();
     updateAllDisplays();
     updateGarageUI();
     updateLevelButtons();
-   
-    console.log('🔄 Прогресс полностью сброшен');
-    alert('Прогресс сброшен! Начинайте заново.');
+    alert('Прогресс сброшен!');
   }
 
   function checkAndUnlockNextCar() {
@@ -467,19 +570,17 @@
       const currentCar = carsConfig[i];
       const nextCar = carsConfig[i + 1];
       if (!nextCar.unlocked) {
-        // Проверяем, прокачана ли текущая машина полностью
         const maxed = Object.keys(currentCar.maxUpgrades).every(key =>
           currentCar.upgradeLevels[key] >= currentCar.maxUpgrades[key]
         );
         if (maxed) {
           nextCar.unlocked = true;
           unlocked = true;
-          console.log(`🎉 Разблокирована новая машина: ${nextCar.name}!`);
         }
       }
     }
     if (unlocked) {
-      saveGameData(true); // Срочное сохранение
+      saveGameData(true);
       updateAllDisplays();
       updateGarageUI();
     }
@@ -496,7 +597,7 @@
       totalCoins -= cost;
       car.upgradeLevels[part]++;
       recalculateCarStats(carIndex);
-      saveGameData(true); // Срочное сохранение
+      saveGameData(true);
       checkAndUnlockNextCar();
       updateAllDisplays();
       updateGarageUI();
@@ -521,8 +622,90 @@
     return base * (car.stats.fuel || 1.0);
   }
 
+  // ===== ПОЛНОЭКРАННЫЙ РЕЖИМ =====
+  function toggleFullscreen() {
+    const gameWrapper = document.getElementById('gameWrapper');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    
+    if (!isFullscreen) {
+      if (gameWrapper.requestFullscreen) {
+        gameWrapper.requestFullscreen();
+      } else if (gameWrapper.webkitRequestFullscreen) {
+        gameWrapper.webkitRequestFullscreen();
+      } else if (gameWrapper.msRequestFullscreen) {
+        gameWrapper.msRequestFullscreen();
+      }
+      
+      gameWrapper.classList.add('fullscreen');
+      fullscreenBtn.textContent = '✕';
+      fullscreenBtn.title = 'Выйти из полноэкранного режима';
+      isFullscreen = true;
+      resizeCanvas();
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
+      
+      gameWrapper.classList.remove('fullscreen');
+      fullscreenBtn.textContent = '⛶';
+      fullscreenBtn.title = 'Полноэкранный режим';
+      isFullscreen = false;
+      canvas.width = W;
+      canvas.height = H;
+    }
+  }
+
+  function resizeCanvas() {
+    if (isFullscreen) {
+      const gameWrapper = document.getElementById('gameWrapper');
+      const maxWidth = gameWrapper.clientWidth;
+      const maxHeight = gameWrapper.clientHeight;
+      const ratio = W / H;
+      
+      let newWidth, newHeight;
+      if (maxWidth / maxHeight > ratio) {
+        newHeight = maxHeight;
+        newWidth = newHeight * ratio;
+      } else {
+        newWidth = maxWidth;
+        newHeight = newWidth / ratio;
+      }
+      
+      canvas.style.width = newWidth + 'px';
+      canvas.style.height = newHeight + 'px';
+    } else {
+      canvas.style.width = '';
+      canvas.style.height = '';
+    }
+  }
+
+  function handleFullscreenChange() {
+    const gameWrapper = document.getElementById('gameWrapper');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    
+    if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+      gameWrapper.classList.remove('fullscreen');
+      fullscreenBtn.textContent = '⛶';
+      fullscreenBtn.title = 'Полноэкранный режим';
+      isFullscreen = false;
+      canvas.width = W;
+      canvas.height = H;
+      canvas.style.width = '';
+      canvas.style.height = '';
+    }
+  }
+
   // ===== ИГРОВАЯ ЛОГИКА =====
-  const car={x:200,y:0,vx:0,vy:0,angle:0,angularVelocity:0,width:65,height:30,wheelRotation:0,onGround:true,wheel1:{x:0,y:0,onGround:false,groundY:0},wheel2:{x:0,y:0,onGround:false,groundY:0}};
+  const car={
+    x:200, y:0, vx:0, vy:0, angle:0, angularVelocity:0, 
+    width:65, height:30, wheelRotation:0, onGround:true,
+    wheel1:{x:0, y:0, onGround:false, groundY:0},
+    wheel2:{x:0, y:0, onGround:false, groundY:0}
+  };
 
   const levelConfigs=[
     {name:"Зеленые холмы",terrain:"gentle",length:4000,fuel:100,fuelCans:5,coins:20,diff:1,jumps:0.4},
@@ -693,7 +876,7 @@
     if(!levelComplete&&!isEndless){
       levelComplete=true;
       totalCoins+=coins;
-      saveGameData(true); // Срочное сохранение
+      saveGameData(true);
       document.getElementById('winStats').textContent=`Дист: ${Math.floor(distance)}м | Монеты: ${coins} | Всего: ${totalCoins}`;
       document.getElementById('winOverlay').classList.add('active');
       updateAllDisplays();
@@ -704,7 +887,7 @@
     if(!gameOver&&!levelComplete&&gameStarted){
       gameOver=true;
       totalCoins+=coins;
-      saveGameData(true); // Срочное сохранение
+      saveGameData(true);
       document.getElementById('gameoverStats').textContent=`Дист: ${Math.floor(distance)}м | Монеты: ${coins} | Всего: ${totalCoins}`;
       document.getElementById('gameoverOverlay').classList.add('active');
       updateAllDisplays();
@@ -715,7 +898,7 @@
     if(!outOfFuel&&!gameOver&&!levelComplete){
       outOfFuel=true;
       totalCoins+=coins;
-      saveGameData(true); // Срочное сохранение
+      saveGameData(true);
       document.getElementById('fuelStats').textContent=`Дист: ${Math.floor(distance)}м | Монеты: ${coins} | Всего: ${totalCoins}`;
       document.getElementById('outOfFuelOverlay').classList.add('active');
       updateAllDisplays();
@@ -726,7 +909,12 @@
     for(let i=0;i<count;i++)particles.push({x,y,vx:(Math.random()-0.5)*(vel||4),vy:(Math.random()-0.5)*3-2,life:10+Math.random()*15,color,size:1.5+Math.random()*2.5});
   }
 
-  const ENGINE_POWER=0.55, BRAKE_POWER=0.8, AIR_FRICTION=0.999, MAX_SPEED=8, MAX_REVERSE=1.5;
+  // УМЕНЬШЕНА МОЩНОСТЬ И СИЛА ВЗЛЁТА, БОЛЕЕ ДОЛГИЙ РАЗГОН
+  const ENGINE_POWER=0.55; // Было 0.65
+  const BRAKE_POWER=0.8;
+  const AIR_FRICTION=0.997; // Было 0.998, больше сопротивления
+  const MAX_SPEED=9.5; // ~80 км/ч при множителе 8.5
+  const MAX_REVERSE=1.5;
 
   function updateCar(){
     if(gameOver||outOfFuel||levelComplete)return;
@@ -734,7 +922,7 @@
     const tireGrip=getTireGrip();
     const currentMaxSpeed=MAX_SPEED * tireGrip;
    
-    if(Math.abs(car.vx)>0.1)fuel-=0.005+Math.abs(car.vx)*0.003;else fuel-=0.001;
+    if(Math.abs(car.vx)>0.1)fuel-=0.004+Math.abs(car.vx)*0.0025;else fuel-=0.0009;
     if(fuel<=0){fuel=0;outOfFuelEvent();return;}
     document.getElementById('fuelDisplay').textContent=Math.floor(fuel);
    
@@ -747,58 +935,121 @@
    
     const slope=getTerrainAngle(car.x),isGas=keys['ArrowRight']||keys['KeyD'],isBrake=keys['ArrowLeft']||keys['KeyA'];
     let ef=0;
-    if(isGas){gameStarted=true;let pf=1.0;if(slope>0.2)pf=Math.max(0.35,1.0-slope*1.3);ef=enginePower*pf;}
-    if(isBrake){gameStarted=true;if(car.vx>0)ef=-BRAKE_POWER*tireGrip;}
-    if(!isGas&&!isBrake&&car.onGround){if(car.vx>0.1)car.vx*=0.97;else if(car.vx>0)car.vx=0;}
+    
+    if(isGas){
+      gameStarted=true;
+      let pf=1.0;
+      if(slope>0.15)pf=Math.max(0.2,1.0-slope*1.7);
+      // БОЛЕЕ ДОЛГИЙ РАЗГОН
+      let startFactor = 1.0;
+      if(Math.abs(car.vx) < 2.0) startFactor = 0.5 + Math.abs(car.vx) * 0.25;
+      else if(Math.abs(car.vx) < 5.0) startFactor = 0.75 + (Math.abs(car.vx)-2.0) * 0.083;
+      ef=enginePower*pf*startFactor;
+    }
+    if(isBrake){
+      gameStarted=true;
+      if(car.vx>0)ef=-BRAKE_POWER*tireGrip;
+    }
+    
+    if(!isGas&&!isBrake&&car.onGround){
+      if(car.vx>0.1)car.vx*=0.955;
+      else if(car.vx>0)car.vx=0;
+    }
    
     if(!car.onGround){
-      if(keys['ArrowUp']||keys['KeyW'])car.angularVelocity-=0.03;
-      if(keys['ArrowDown']||keys['KeyS'])car.angularVelocity+=0.03;
-      car.angularVelocity*=0.997;airTime+=0.016;if(airTime>maxAirTime)maxAirTime=airTime;
+      if(keys['ArrowUp']||keys['KeyW'])car.angularVelocity-=0.025;
+      if(keys['ArrowDown']||keys['KeyS'])car.angularVelocity+=0.025;
+      car.angularVelocity*=0.997;
+      airTime+=0.016;if(airTime>maxAirTime)maxAirTime=airTime;
     }else{
       airTime=0;
-      const ad=slope-car.angle;car.angularVelocity+=ad*0.05*tireGrip;car.angularVelocity*=0.9;
+      const ad=slope-car.angle;car.angularVelocity+=ad*0.05*tireGrip;
+      car.angularVelocity*=0.9;
+      
+      // УМЕНЬШЕНА СИЛА ВЗЛЁТА С ТРАМПЛИНОВ
       if(car.vx>3){
         const cy=getTerrainY(car.x),ny=getTerrainY(car.x+car.vx*4),drop=cy-ny;
-        if(drop>8){car.vy-=drop*0.06*(levelConfig.jumps||0.8);if(car.onGround&&drop>12)spawnParticles(car.x,cy,5,'#ffffff',4);}
+        if(drop>8){
+          car.vy-=drop*0.025*(levelConfig.jumps||0.8); // Было 0.04
+          if(car.onGround&&drop>12)spawnParticles(car.x,cy,3,'#ffffff',3);
+        }
       }
     }
    
-    car.vx+=ef;car.vx*=AIR_FRICTION;car.vy+=GRAVITY;
+    car.vx+=ef;
+    car.vx*=AIR_FRICTION;
+    car.vy+=GRAVITY;
+    
     car.vx=Math.max(-MAX_REVERSE,Math.min(car.vx,currentMaxSpeed));
-    car.angularVelocity=Math.max(-0.1,Math.min(car.angularVelocity,0.1));car.angularVelocity*=0.97;car.angle+=car.angularVelocity;
-    car.x+=car.vx;car.y+=car.vy;
+    car.angularVelocity=Math.max(-0.1,Math.min(car.angularVelocity,0.1));
+    car.angularVelocity*=0.97;
+    car.angle+=car.angularVelocity;
+    car.x+=car.vx;
+    car.y+=car.vy;
    
-    if(gameStarted){const h=getDriverHeadPosition();if(h.y>=getTerrainY(h.x)-5){gameOverCrash();return;}}
-    if(car.y>H+300||car.y<-800){if(gameStarted)gameOverCrash();else resetCar();return;}
+    if(gameStarted){
+      const h=getDriverHeadPosition();
+      if(h.y>=getTerrainY(h.x)-5){
+        gameOverCrash();
+        return;
+      }
+    }
+    
     if(!isEndless&&car.x>=finishLineX){completeLevel();return;}
    
-    const hw=car.width*0.38,wb=car.height*0.28;
+    const hw=car.width*0.38, wb=car.height*0.28;
+    
     car.wheel1.x=car.x-hw*Math.cos(car.angle)-wb*Math.sin(car.angle);
     car.wheel1.y=car.y-hw*Math.sin(car.angle)+wb*Math.cos(car.angle);
     car.wheel2.x=car.x+hw*Math.cos(car.angle)-wb*Math.sin(car.angle);
     car.wheel2.y=car.y+hw*Math.sin(car.angle)+wb*Math.cos(car.angle);
-    car.wheel1.groundY=getTerrainY(car.wheel1.x);car.wheel2.groundY=getTerrainY(car.wheel2.x);
-    car.wheel1.onGround=car.wheel1.y>=car.wheel1.groundY-2;car.wheel2.onGround=car.wheel2.y>=car.wheel2.groundY-2;
-    const wog=car.onGround;car.onGround=car.wheel1.onGround||car.wheel2.onGround;
-   
-    if(car.wheel1.onGround&&car.wheel1.y>car.wheel1.groundY){const p=car.wheel1.y-car.wheel1.groundY;car.y-=p*0.3;if(car.vy>0)car.vy*=-0.2;if(p>5)spawnParticles(car.wheel1.x,car.wheel1.groundY,Math.floor(p),'#8B7355',p);}
-    if(car.wheel2.onGround&&car.wheel2.y>car.wheel2.groundY){const p=car.wheel2.y-car.wheel2.groundY;car.y-=p*0.3;if(car.vy>0)car.vy*=-0.2;if(p>5)spawnParticles(car.wheel2.x,car.wheel2.groundY,Math.floor(p),'#8B7355',p);}
-    if(wog&&!car.onGround&&gameStarted&&car.vx>3)spawnParticles(car.x,getTerrainY(car.x),6,'#ffff88',4);
-    if(!wog&&car.onGround&&gameStarted){const imp=Math.abs(car.vy);if(imp>3)spawnParticles(car.x,car.y,Math.floor(imp*2),'#aa9977',imp);}
+    
+    car.wheel1.groundY=getTerrainY(car.wheel1.x);
+    car.wheel2.groundY=getTerrainY(car.wheel2.x);
+    
+    car.wheel1.onGround=car.wheel1.y>=car.wheel1.groundY-2;
+    car.wheel2.onGround=car.wheel2.y>=car.wheel2.groundY-2;
+    
+    const wog=car.onGround;
+    car.onGround=car.wheel1.onGround||car.wheel2.onGround;
+    
+    if(car.wheel1.onGround&&car.wheel1.y>car.wheel1.groundY){
+      const p=car.wheel1.y-car.wheel1.groundY;
+      car.y-=p*0.3;
+      if(car.vy>0)car.vy*=-0.2;
+      if(p>5)spawnParticles(car.wheel1.x,car.wheel1.groundY,Math.floor(p),'#8B7355',p);
+    }
+    if(car.wheel2.onGround&&car.wheel2.y>car.wheel2.groundY){
+      const p=car.wheel2.y-car.wheel2.groundY;
+      car.y-=p*0.3;
+      if(car.vy>0)car.vy*=-0.2;
+      if(p>5)spawnParticles(car.wheel2.x,car.wheel2.groundY,Math.floor(p),'#8B7355',p);
+    }
+    
+    if(wog&&!car.onGround&&gameStarted&&car.vx>3)spawnParticles(car.x,getTerrainY(car.x),4,'#ffff88',3);
+    if(!wog&&car.onGround&&gameStarted){
+      const imp=Math.abs(car.vy);
+      if(imp>3)spawnParticles(car.x,car.y,Math.floor(imp*1.5),'#aa9977',imp);
+    }
    
     if(car.x<30){car.x=30;car.vx=Math.max(0,car.vx);}
     if(!isEndless&&car.x>TERRAIN_LENGTH-30)car.x=TERRAIN_LENGTH-30;
-    car.wheelRotation+=car.vx*0.12;if(car.vx>0)distance+=car.vx*0.03;
-    document.getElementById('speedDisplay').textContent=Math.abs(Math.floor(car.vx*35));
-   
+    car.wheelRotation+=car.vx*0.12;
+    if(car.vx>0)distance+=car.vx*0.03;
+    
+    document.getElementById('speedDisplay').textContent=Math.abs(Math.floor(car.vx*8.5));
+    
     for(const c of coins_list){if(!c.collected&&Math.hypot(car.x-c.x,car.y-c.y)<28){c.collected=true;coins++;spawnParticles(c.x,c.y,5,'#ffd700',3);}}
     for(const c of fuelCans_list){if(!c.collected&&Math.hypot(car.x-c.x,car.y-c.y)<28){c.collected=true;fuel=Math.min(getFuelCapacity(),fuel+25);spawnParticles(c.x,c.y,8,'#00ff00',4);document.getElementById('fuelDisplay').textContent=Math.floor(fuel);}}
     if(car.onGround&&Math.abs(car.vx)>2&&Math.random()<0.4){const w=car.vx>0?car.wheel1:car.wheel2;spawnParticles(w.x,w.groundY,1,'#8B7355',2);}
   }
 
   function updateParticles(){for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.x+=p.vx;p.y+=p.vy;p.vy+=0.2;p.life--;if(p.life<=0)particles.splice(i,1);}}
-  function updateCamera(){const tx=car.x-W*0.35;cameraX+=(tx-cameraX)*0.05;cameraX=Math.max(0,cameraX);}
+  function updateCamera(){
+    const tx=car.x-W*0.35;
+    cameraX+=(tx-cameraX)*0.06;
+    cameraX=Math.max(0,cameraX);
+  }
 
   function drawSky(){
     const c=levelConfig||{terrain:"gentle"};let cols;
@@ -871,6 +1122,15 @@
     if(!car.onGround&&airTime>0.3){ctx.fillStyle='#ff0';ctx.font='bold 13px Arial';ctx.textAlign='center';ctx.fillText(`🛫 ${airTime.toFixed(1)}с`,W/2,H-8);ctx.textAlign='start';}
     if(fuel<10&&fuel>0&&Math.sin(Date.now()*0.01)>0){ctx.fillStyle='#f00';ctx.font='bold 11px Arial';ctx.textAlign='center';ctx.fillText('⚠️ ТОПЛИВО!',W/2,H-25);ctx.textAlign='start';}
     if(!gameStarted){ctx.fillStyle='rgba(0,0,0,0.7)';ctx.fillRect(W/2-80,H/2-16,160,32);ctx.fillStyle='#fff';ctx.font='bold 13px Arial';ctx.textAlign='center';ctx.fillText('→ СТАРТ',W/2,H/2+4);ctx.textAlign='start';}
+    
+    if(car.y < -100 && gameStarted) {
+      ctx.fillStyle='#ff0';ctx.font='bold 11px Arial';ctx.textAlign='center';
+      ctx.fillText('🚀 ВЫСОКИЙ ПОЛЁТ!',W/2,50);ctx.textAlign='start';
+    }
+    if(car.y > H+100 && gameStarted) {
+      ctx.fillStyle='#f00';ctx.font='bold 11px Arial';ctx.textAlign='center';
+      ctx.fillText('⚠️ НИЗКО!',W/2,H-50);ctx.textAlign='start';
+    }
   }
 
   // ===== ГАРАЖ =====
@@ -881,14 +1141,14 @@
 
   function closeGarage() {
     document.getElementById('garageOverlay').classList.remove('active');
-    saveGameData(true); // Сохраняем при закрытии
+    saveGameData(true);
     updateAllDisplays();
   }
 
   function selectCar(index) {
     if (!carsConfig[index].unlocked) return;
     currentCarIndex = index;
-    saveGameData(true); // Срочное сохранение
+    saveGameData(true);
     resetCar();
     updateGarageUI();
     updateAllDisplays();
@@ -991,7 +1251,7 @@
     document.getElementById('totalCoinsDisplay').textContent = totalCoins;
     document.getElementById('currentCarDisplay').textContent = carsConfig[currentCarIndex].name;
     document.getElementById('fuelDisplay').textContent = Math.floor(fuel);
-    document.getElementById('speedDisplay').textContent = Math.abs(Math.floor(car.vx*35));
+    document.getElementById('speedDisplay').textContent = Math.abs(Math.floor(car.vx*8.5));
     if (!isEndless) {
       document.getElementById('levelDisplay').textContent = currentLevel;
     }
@@ -1013,30 +1273,89 @@
   function render(){ctx.clearRect(0,0,W,H);drawSky();drawTerrain();drawCoins();drawFuelCans();drawParticles();drawCar();drawUI();}
   function gameLoop(){updateCar();updateParticles();updateCamera();render();requestAnimationFrame(gameLoop);}
 
-  // Автосохранение при уходе со страницы
+  // Показываем/скрываем элементы управления в зависимости от устройства
+  function updateControlsVisibility() {
+    const touchControls = document.getElementById('touchControls');
+    const desktopControls = document.getElementById('desktopControls');
+    
+    if (isMobile) {
+      touchControls.style.display = 'block';
+      desktopControls.style.display = 'none';
+    } else {
+      touchControls.style.display = 'none';
+      desktopControls.style.display = 'flex';
+    }
+  }
+  
+  updateControlsVisibility();
+
   window.addEventListener('beforeunload', () => {
     saveGameData(true);
   });
 
-  // Автосохранение при сворачивании (мобильные)
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
       saveGameData(true);
     }
   });
 
-  // Периодическое сохранение (каждые 30 секунд)
+  document.addEventListener('fullscreenchange', handleFullscreenChange);
+  document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+  document.addEventListener('msfullscreenchange', handleFullscreenChange);
+  
+  window.addEventListener('resize', resizeCanvas);
+
   setInterval(() => {
     if (!gameOver && !outOfFuel && !levelComplete && gameStarted) {
       saveGameData(false);
     }
   }, 30000);
 
-  window.addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='KeyR')resetCar();e.preventDefault();});
+  window.addEventListener('keydown',e=>{
+    keys[e.code]=true;
+    if(e.code==='KeyR')resetCar();
+    if(e.code==='KeyF')toggleFullscreen();
+    e.preventDefault();
+  });
   window.addEventListener('keyup',e=>{keys[e.code]=false;e.preventDefault();});
  
-  function setupBtn(id,code){const btn=document.getElementById(id);if(!btn)return;btn.addEventListener('pointerdown',e=>{e.preventDefault();keys[code]=true;});btn.addEventListener('pointerup',e=>{e.preventDefault();keys[code]=false;});btn.addEventListener('pointerleave',()=>{keys[code]=false;});}
-  setupBtn('btnGas','ArrowRight');setupBtn('btnBrake','ArrowLeft');setupBtn('btnTiltUp','ArrowUp');setupBtn('btnTiltDown','ArrowDown');
+  // УЛУЧШЕННАЯ ОБРАБОТКА СЕНСОРНЫХ КНОПОК
+  function setupBtn(id,code){
+    const btn=document.getElementById(id);
+    if(!btn)return;
+    
+    btn.addEventListener('pointerdown',e=>{
+      e.preventDefault();
+      keys[code]=true;
+      btn.style.transform = 'scale(0.92)';
+    });
+    
+    btn.addEventListener('pointerup',e=>{
+      e.preventDefault();
+      keys[code]=false;
+      btn.style.transform = '';
+    });
+    
+    btn.addEventListener('pointerleave',()=>{
+      keys[code]=false;
+      btn.style.transform = '';
+    });
+    
+    btn.addEventListener('pointercancel',()=>{
+      keys[code]=false;
+      btn.style.transform = '';
+    });
+    
+    // Предотвращаем контекстное меню
+    btn.addEventListener('contextmenu',e=>{
+      e.preventDefault();
+    });
+  }
+  
+  setupBtn('btnGas','ArrowRight');
+  setupBtn('btnBrake','ArrowLeft');
+  setupBtn('btnTiltUp','ArrowUp');
+  setupBtn('btnTiltDown','ArrowDown');
  
   document.getElementById('restartBtn').addEventListener('click',resetCar);
   document.getElementById('fuelRestartBtn').addEventListener('click',resetCar);
@@ -1046,7 +1365,8 @@
   document.getElementById('openGarageBtn').addEventListener('click',openGarage);
   document.getElementById('closeGarageBtn').addEventListener('click',closeGarage);
  
-  // Кнопка сброса прогресса
+  document.getElementById('fullscreenBtn').addEventListener('click', toggleFullscreen);
+ 
   document.getElementById('resetProgressBtn').addEventListener('click', () => {
     document.getElementById('resetConfirmOverlay').classList.add('active');
   });
@@ -1066,10 +1386,14 @@
   updateLevelButtons();
   gameLoop();
  
-  console.log('🚗 Hill Climb Racing запущен!');
-  console.log('💾 Система сохранения активна');
-  console.log('📱 Данные сохраняются автоматически');
+  console.log('🚗 Hill Climb Racing v1.9 запущен!');
+  console.log('✨ Изменения:');
+  console.log('  - Уменьшена сила взлёта с трамплинов (0.025 вместо 0.04)');
+  console.log('  - Более долгий разгон до 80 км/ч');
+  console.log('  - Улучшенные сенсорные кнопки для телефонов');
+  console.log('  - Раздельные элементы управления для ПК и мобильных');
 })();
 </script>
 </body>
 </html>
+       
