@@ -12,14 +12,14 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      min-height: 100dvh; /* dynamic viewport height для мобильных */
+      min-height: 100dvh;
       font-family: 'Arial', sans-serif;
       flex-direction: column;
       touch-action: manipulation;
       user-select: none;
       -webkit-user-select: none;
-      overflow: hidden; /* Запрещаем скролл на мобильных */
-      position: fixed; /* Фиксируем body на мобильных */
+      overflow: hidden;
+      position: fixed;
       width: 100%;
       height: 100%;
     }
@@ -41,6 +41,7 @@
       border: 2px solid #ff4400;
       position: relative;
       flex-shrink: 0;
+      background: #000;
     }
     canvas { 
       display: block; 
@@ -67,6 +68,7 @@
       display: flex; gap: 4px; align-items: center; flex-wrap: wrap;
       color: #ffaa00; font-weight: bold; font-size: 0.7rem;
       background: #111; padding: 4px 8px; border-radius: 6px; border: 1px solid #ff4400;
+      z-index: 5;
     }
     .menu-bar span { color: #ffd700; }
     .garage-btn {
@@ -74,42 +76,39 @@
       padding: 3px 8px; font-weight: bold; border-radius: 6px;
       cursor: pointer; font-size: 0.7rem;
     }
-    .garage-btn:hover { background: #ff6600; }
     .reset-btn {
       background: #333; color: #fff; border: none;
       padding: 3px 8px; font-weight: bold; border-radius: 6px;
       cursor: pointer; font-size: 0.7rem;
     }
-    .reset-btn:hover { background: #555; }
-    .level-select { display: flex; flex-wrap: wrap; gap: 2px; justify-content: center; margin: 1px 0; max-width: 100%; }
+    .level-select { display: flex; flex-wrap: wrap; gap: 2px; justify-content: center; margin: 1px 0; max-width: 100%; z-index: 5; }
     .level-btn {
       padding: 2px 5px; background: #111; color: #ff4400;
       border: 1px solid #ff4400; border-radius: 3px;
       cursor: pointer; font-weight: bold; font-size: 7px; transition: all 0.2s;
     }
-    .level-btn:hover { background: #ff4400; color: #000; }
     .level-btn.active { background: #cc3300; color: #fff; }
     .level-btn.endless { background: #220044; color: #cc88ff; border-color: #cc88ff; }
     .level-btn.endless.active { background: #6600cc; color: #fff; }
-    .info { text-align: center; color: #ff4400; font-weight: bold; font-size: 0.65rem; }
-    .controls-panel { display: flex; gap: 3px; flex-wrap: wrap; justify-content: center; color: #666; font-size: 0.5rem; }
+    .info { text-align: center; color: #ff4400; font-weight: bold; font-size: 0.65rem; z-index: 5; }
+    .controls-panel { display: flex; gap: 3px; flex-wrap: wrap; justify-content: center; color: #666; font-size: 0.5rem; z-index: 5; }
     .controls-panel span { background: #0a0a0a; padding: 1px 4px; border-radius: 4px; border: 1px solid #222; }
     
-    /* УЛУЧШЕННЫЕ СЕНСОРНЫЕ КНОПКИ - ПОЛУПРОЗРАЧНЫЕ И НЕ МЕШАЮТ */
+    /* СЕНСОРНЫЕ КНОПКИ ПОВЕРХ ИГРЫ */
     .touch-controls { 
       display: none; 
-      position: fixed;
-      bottom: 15px;
+      position: absolute;
+      bottom: 10px;
       left: 0;
       right: 0;
-      z-index: 50;
+      z-index: 20;
       pointer-events: none;
     }
     .touch-controls-inner {
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
-      padding: 0 20px;
+      padding: 0 15px;
       max-width: 100%;
       margin: 0 auto;
       pointer-events: none;
@@ -121,13 +120,13 @@
       pointer-events: auto;
     }
     .touch-pedal {
-      width: 65px;
-      height: 65px;
+      width: 60px;
+      height: 60px;
       border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.25);
-      background: rgba(0,0,0,0.35);
+      border: 2px solid rgba(255,255,255,0.3);
+      background: rgba(0,0,0,0.4);
       color: rgba(255,255,255,0.7);
-      font-size: 24px;
+      font-size: 22px;
       font-weight: bold;
       display: flex;
       align-items: center;
@@ -137,43 +136,32 @@
       user-select: none;
       -webkit-tap-highlight-color: transparent;
       transition: all 0.1s;
-      box-shadow: none;
       backdrop-filter: blur(3px);
       -webkit-backdrop-filter: blur(3px);
     }
     .touch-pedal:active {
-      background: rgba(255,100,0,0.5);
-      border-color: rgba(255,100,0,0.7);
+      background: rgba(255,100,0,0.6);
+      border-color: rgba(255,100,0,0.8);
       transform: scale(0.9);
       color: #fff;
     }
-    .touch-pedal.gas {
-      border-color: rgba(0,255,0,0.3);
-    }
-    .touch-pedal.gas:active {
-      background: rgba(0,180,0,0.5);
-      border-color: rgba(0,255,0,0.6);
-    }
-    .touch-pedal.brake {
-      border-color: rgba(255,0,0,0.3);
-    }
-    .touch-pedal.brake:active {
-      background: rgba(180,0,0,0.5);
-      border-color: rgba(255,0,0,0.6);
-    }
+    .touch-pedal.gas { border-color: rgba(0,255,0,0.4); }
+    .touch-pedal.gas:active { background: rgba(0,180,0,0.6); border-color: rgba(0,255,0,0.7); }
+    .touch-pedal.brake { border-color: rgba(255,0,0,0.4); }
+    .touch-pedal.brake:active { background: rgba(180,0,0,0.6); border-color: rgba(255,0,0,0.7); }
     .touch-tilt-group {
       display: flex;
       gap: 8px;
       pointer-events: auto;
     }
     .touch-tilt-btn {
-      width: 50px;
-      height: 50px;
+      width: 45px;
+      height: 45px;
       border-radius: 10px;
-      border: 2px solid rgba(255,255,255,0.2);
-      background: rgba(0,0,0,0.3);
+      border: 2px solid rgba(255,255,255,0.25);
+      background: rgba(0,0,0,0.35);
       color: rgba(255,255,255,0.6);
-      font-size: 18px;
+      font-size: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -186,8 +174,8 @@
       -webkit-backdrop-filter: blur(3px);
     }
     .touch-tilt-btn:active {
-      background: rgba(255,150,0,0.5);
-      border-color: rgba(255,150,0,0.7);
+      background: rgba(255,150,0,0.6);
+      border-color: rgba(255,150,0,0.8);
       transform: scale(0.9);
       color: #fff;
     }
@@ -228,10 +216,7 @@
       box-shadow: 0 0 80px rgba(255,100,0,0.5);
       max-height: 90vh; overflow-y: auto;
     }
-    .garage-header {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 15px;
-    }
+    .garage-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
     .garage-title {
       font-size: 1.5rem; font-weight: bold;
       background: linear-gradient(45deg, #ff4400, #ff8800);
@@ -255,10 +240,7 @@
     .car-name { font-weight: bold; color: #fff; font-size: 0.85rem; }
     .car-desc { color: #888; font-size: 0.6rem; margin: 3px 0; }
     .car-lock { position: absolute; top: 8px; right: 8px; color: #ff4400; font-size: 1rem; }
-    .upgrades-section {
-      background: rgba(0,0,0,0.4); border-radius: 10px;
-      padding: 12px; margin-bottom: 15px;
-    }
+    .upgrades-section { background: rgba(0,0,0,0.4); border-radius: 10px; padding: 12px; margin-bottom: 15px; }
     .upgrades-title { color: #ffaa00; font-weight: bold; font-size: 1rem; margin-bottom: 12px; text-align: center; }
     .upgrade-item {
       display: flex; align-items: center; justify-content: space-between;
@@ -268,10 +250,7 @@
     .upgrade-info { flex: 1; }
     .upgrade-name { color: #fff; font-weight: bold; font-size: 0.8rem; }
     .upgrade-level { color: #ffaa00; font-size: 0.6rem; }
-    .upgrade-bar {
-      width: 100%; height: 5px; background: #222;
-      border-radius: 3px; margin-top: 2px; overflow: hidden;
-    }
+    .upgrade-bar { width: 100%; height: 5px; background: #222; border-radius: 3px; margin-top: 2px; overflow: hidden; }
     .upgrade-fill { height: 100%; background: linear-gradient(90deg, #ff4400, #ff8800); transition: width 0.3s; }
     .upgrade-btn {
       background: #ff4400; color: #000; border: none;
@@ -286,6 +265,43 @@
     .save-indicator { color: #0f0; font-size: 0.6rem; opacity: 0; transition: opacity 0.3s; }
     .save-indicator.show { opacity: 1; }
     
+    /* ПОЛНОЭКРАННЫЙ РЕЖИМ ДЛЯ ТЕЛЕФОНОВ */
+    .game-wrapper.fullscreen-mobile {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      width: 100dvw;
+      height: 100dvh;
+      z-index: 9999;
+      border: none;
+      border-radius: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      margin: 0;
+      padding: 0;
+    }
+    .game-wrapper.fullscreen-mobile canvas {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .game-wrapper.fullscreen-mobile .fullscreen-btn {
+      top: 10px;
+      right: 10px;
+      font-size: 0.8rem;
+      padding: 6px 12px;
+      z-index: 30;
+    }
+    .game-wrapper.fullscreen-mobile .touch-controls {
+      display: block;
+      bottom: 15px;
+    }
+    
+    /* ПК полноэкранный режим */
     .game-wrapper.fullscreen {
       position: fixed;
       top: 0;
@@ -330,23 +346,23 @@
   <div class="game-wrapper" id="gameWrapper">
     <button class="fullscreen-btn" id="fullscreenBtn" title="Полноэкранный режим">⛶</button>
     <canvas id="gameCanvas" width="900" height="500"></canvas>
-  </div>
-  <div class="info" id="infoDisplay">🏔️ HILL CLIMB RACING | Ур: <span id="levelDisplay">1</span> | <span id="speedDisplay">0</span> км/ч | ⛽<span id="fuelDisplay">100</span>%</div>
-  <div class="controls-panel" id="desktopControls"><span>→ газ</span><span>← тормоз</span><span>↑↓ наклон</span><span>R рестарт</span><span>F фулскрин</span></div>
-  <div class="touch-controls" id="touchControls">
-    <div class="touch-controls-inner">
-      <div class="touch-pedal-group">
-        <button class="touch-pedal brake" id="btnBrake">◀</button>
-      </div>
-      <div class="touch-tilt-group">
-        <button class="touch-tilt-btn" id="btnTiltUp">▲</button>
-        <button class="touch-tilt-btn" id="btnTiltDown">▼</button>
-      </div>
-      <div class="touch-pedal-group">
-        <button class="touch-pedal gas" id="btnGas">▶</button>
+    <div class="touch-controls" id="touchControls">
+      <div class="touch-controls-inner">
+        <div class="touch-pedal-group">
+          <button class="touch-pedal brake" id="btnBrake">◀</button>
+        </div>
+        <div class="touch-tilt-group">
+          <button class="touch-tilt-btn" id="btnTiltUp">▲</button>
+          <button class="touch-tilt-btn" id="btnTiltDown">▼</button>
+        </div>
+        <div class="touch-pedal-group">
+          <button class="touch-pedal gas" id="btnGas">▶</button>
+        </div>
       </div>
     </div>
   </div>
+  <div class="info" id="infoDisplay">🏔️ HILL CLIMB RACING | Ур: <span id="levelDisplay">1</span> | <span id="speedDisplay">0</span> км/ч | ⛽<span id="fuelDisplay">100</span>%</div>
+  <div class="controls-panel" id="desktopControls"><span>→ газ</span><span>← тормоз</span><span>↑↓ наклон</span><span>R рестарт</span><span>F фулскрин</span></div>
 </div>
 
 <!-- ЭКРАНЫ -->
@@ -381,12 +397,11 @@
   const ctx = canvas.getContext('2d');
   const W=900, H=500;
   
-  // ЕДИНЫЕ НАСТРОЙКИ ДЛЯ ВСЕХ УСТРОЙСТВ
   const GRAVITY=0.65;
   const ENGINE_POWER=0.55;
   const BRAKE_POWER=0.8;
   const AIR_FRICTION=0.997;
-  const MAX_SPEED=9.5; // ~80 км/ч
+  const MAX_SPEED=9.5;
   const MAX_REVERSE=1.5;
   
   const keys={};
@@ -395,8 +410,8 @@
   let currentCarIndex=0;
   let saveTimeout = null;
   let isFullscreen = false;
+  let isMobileFullscreen = false;
 
-  // Определение мобильного устройства
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
                    (navigator.maxTouchPoints > 1 && window.innerWidth < 1024);
 
@@ -441,30 +456,22 @@
   ];
 
   function showSaveIndicator(elementId) {
-    const indicator = document.getElementById(elementId);
-    if (indicator) {
-      indicator.classList.add('show');
-      setTimeout(() => indicator.classList.remove('show'), 2000);
-    }
+    const el = document.getElementById(elementId);
+    if (el) { el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 2000); }
   }
 
   function saveGameData(immediate = false) {
     if (!immediate && saveTimeout) clearTimeout(saveTimeout);
-    if (!immediate) {
-      saveTimeout = setTimeout(() => performSave(), 500);
-    } else {
-      performSave();
-    }
+    if (!immediate) { saveTimeout = setTimeout(() => performSave(), 500); }
+    else { performSave(); }
   }
 
   function performSave() {
     try {
       const data = {
-        totalCoins: totalCoins,
-        currentCarIndex: currentCarIndex,
+        totalCoins, currentCarIndex,
         cars: carsConfig.map(c => ({ unlocked: c.unlocked, upgradeLevels: c.upgradeLevels })),
-        timestamp: Date.now(),
-        version: '2.0'
+        timestamp: Date.now(), version: '2.1'
       };
       localStorage.setItem('hcr_garage', JSON.stringify(data));
       showSaveIndicator('saveIndicator');
@@ -481,16 +488,16 @@
         if (typeof data.totalCoins === 'number' && data.totalCoins >= 0) totalCoins = data.totalCoins;
         if (typeof data.currentCarIndex === 'number' && data.currentCarIndex >= 0 && data.currentCarIndex < carsConfig.length) currentCarIndex = data.currentCarIndex;
         if (data.cars && Array.isArray(data.cars)) {
-          data.cars.forEach((savedCar, index) => {
-            if (carsConfig[index] && savedCar) {
-              if (typeof savedCar.unlocked === 'boolean') carsConfig[index].unlocked = savedCar.unlocked;
-              if (savedCar.upgradeLevels) {
-                carsConfig[index].upgradeLevels = {
-                  engine: savedCar.upgradeLevels.engine || 0,
-                  tires: savedCar.upgradeLevels.tires || 0,
-                  fuel: savedCar.upgradeLevels.fuel || 0
+          data.cars.forEach((sc, i) => {
+            if (carsConfig[i] && sc) {
+              if (typeof sc.unlocked === 'boolean') carsConfig[i].unlocked = sc.unlocked;
+              if (sc.upgradeLevels) {
+                carsConfig[i].upgradeLevels = {
+                  engine: sc.upgradeLevels.engine || 0,
+                  tires: sc.upgradeLevels.tires || 0,
+                  fuel: sc.upgradeLevels.fuel || 0
                 };
-                recalculateCarStats(index);
+                recalculateCarStats(i);
               }
             }
           });
@@ -502,19 +509,19 @@
     } catch(e) { return false; }
   }
 
-  function recalculateCarStats(carIndex) {
-    const car = carsConfig[carIndex];
-    car.stats.engine = 1.0 + (car.upgradeLevels.engine * 0.2 * (1 + carIndex * 0.25));
-    car.stats.tires = 1.0 + (car.upgradeLevels.tires * 0.2 * (1 + carIndex * 0.25));
-    car.stats.fuel = 1.0 + (car.upgradeLevels.fuel * 0.2 * (1 + carIndex * 0.25));
+  function recalculateCarStats(i) {
+    const c = carsConfig[i];
+    c.stats.engine = 1.0 + c.upgradeLevels.engine * 0.2 * (1 + i * 0.25);
+    c.stats.tires = 1.0 + c.upgradeLevels.tires * 0.2 * (1 + i * 0.25);
+    c.stats.fuel = 1.0 + c.upgradeLevels.fuel * 0.2 * (1 + i * 0.25);
   }
 
   function resetAllProgress() {
     totalCoins = 0; currentCarIndex = 0;
-    carsConfig.forEach((car, index) => {
-      car.unlocked = (index === 0);
-      car.upgradeLevels = { engine: 0, tires: 0, fuel: 0 };
-      car.stats = { engine: 1.0, tires: 1.0, fuel: 1.0 };
+    carsConfig.forEach((c, i) => {
+      c.unlocked = (i === 0);
+      c.upgradeLevels = { engine: 0, tires: 0, fuel: 0 };
+      c.stats = { engine: 1.0, tires: 1.0, fuel: 1.0 };
     });
     localStorage.removeItem('hcr_garage');
     resetCar(); updateAllDisplays(); updateGarageUI(); updateLevelButtons();
@@ -524,23 +531,20 @@
   function checkAndUnlockNextCar() {
     let unlocked = false;
     for (let i = 0; i < carsConfig.length - 1; i++) {
-      const currentCar = carsConfig[i], nextCar = carsConfig[i + 1];
-      if (!nextCar.unlocked) {
-        const maxed = Object.keys(currentCar.maxUpgrades).every(key => currentCar.upgradeLevels[key] >= currentCar.maxUpgrades[key]);
-        if (maxed) { nextCar.unlocked = true; unlocked = true; }
+      if (!carsConfig[i+1].unlocked && Object.keys(carsConfig[i].maxUpgrades).every(k => carsConfig[i].upgradeLevels[k] >= carsConfig[i].maxUpgrades[k])) {
+        carsConfig[i+1].unlocked = true; unlocked = true;
       }
     }
     if (unlocked) { saveGameData(true); updateAllDisplays(); updateGarageUI(); }
   }
 
-  function upgradePart(carIndex, part) {
-    const car = carsConfig[carIndex];
-    if (car.upgradeLevels[part] >= car.maxUpgrades[part]) return false;
-    const cost = car.upgradeCosts[part][car.upgradeLevels[part] + 1];
+  function upgradePart(ci, part) {
+    const c = carsConfig[ci];
+    if (c.upgradeLevels[part] >= c.maxUpgrades[part]) return false;
+    const cost = c.upgradeCosts[part][c.upgradeLevels[part] + 1];
     if (totalCoins >= cost) {
-      totalCoins -= cost; car.upgradeLevels[part]++;
-      recalculateCarStats(carIndex);
-      saveGameData(true); checkAndUnlockNextCar();
+      totalCoins -= cost; c.upgradeLevels[part]++;
+      recalculateCarStats(ci); saveGameData(true); checkAndUnlockNextCar();
       updateAllDisplays(); updateGarageUI();
       return true;
     }
@@ -548,42 +552,126 @@
   }
 
   function getEnginePower() { return ENGINE_POWER * (carsConfig[currentCarIndex].stats.engine || 1.0); }
-  function getTireGrip() { return (carsConfig[currentCarIndex].stats.tires || 1.0); }
-  function getFuelCapacity() {
-    const car = carsConfig[currentCarIndex];
-    return (isEndless ? 60 : (levelConfig.fuel || 100)) * (car.stats.fuel || 1.0);
-  }
+  function getTireGrip() { return carsConfig[currentCarIndex].stats.tires || 1.0; }
+  function getFuelCapacity() { return (isEndless ? 60 : (levelConfig.fuel || 100)) * (carsConfig[currentCarIndex].stats.fuel || 1.0); }
 
   // ===== ПОЛНОЭКРАННЫЙ РЕЖИМ =====
+  function lockOrientation() {
+    if (isMobile && screen.orientation && screen.orientation.lock) {
+      screen.orientation.lock('landscape').catch(() => {});
+    }
+  }
+
+  function unlockOrientation() {
+    if (isMobile && screen.orientation && screen.orientation.unlock) {
+      screen.orientation.unlock();
+    }
+  }
+
   function toggleFullscreen() {
     const gameWrapper = document.getElementById('gameWrapper');
     const fullscreenBtn = document.getElementById('fullscreenBtn');
+    
     if (!isFullscreen) {
-      if (gameWrapper.requestFullscreen) gameWrapper.requestFullscreen();
-      else if (gameWrapper.webkitRequestFullscreen) gameWrapper.webkitRequestFullscreen();
-      gameWrapper.classList.add('fullscreen');
-      fullscreenBtn.textContent = '✕';
-      isFullscreen = true;
+      if (isMobile) {
+        // Мобильный полноэкранный режим
+        lockOrientation();
+        gameWrapper.classList.add('fullscreen-mobile');
+        isMobileFullscreen = true;
+        
+        // Скрываем внешние элементы
+        document.querySelector('.menu-bar').style.display = 'none';
+        document.querySelector('.level-select').style.display = 'none';
+        document.querySelector('.info').style.display = 'none';
+        document.querySelector('.controls-panel').style.display = 'none';
+        
+        fullscreenBtn.textContent = '✕';
+        fullscreenBtn.title = 'Выйти';
+        isFullscreen = true;
+        
+        // Показываем кнопки управления внутри game-wrapper
+        document.getElementById('touchControls').style.display = 'block';
+        
+        // Оптимизируем размер канваса
+        resizeMobileCanvas();
+      } else {
+        // ПК полноэкранный режим
+        if (gameWrapper.requestFullscreen) gameWrapper.requestFullscreen();
+        else if (gameWrapper.webkitRequestFullscreen) gameWrapper.webkitRequestFullscreen();
+        gameWrapper.classList.add('fullscreen');
+        fullscreenBtn.textContent = '✕';
+        isFullscreen = true;
+      }
     } else {
-      if (document.exitFullscreen) document.exitFullscreen();
-      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-      gameWrapper.classList.remove('fullscreen');
-      fullscreenBtn.textContent = '⛶';
-      isFullscreen = false;
-      canvas.width = W; canvas.height = H;
+      if (isMobile) {
+        // Выход из мобильного полноэкранного режима
+        unlockOrientation();
+        gameWrapper.classList.remove('fullscreen-mobile');
+        isMobileFullscreen = false;
+        
+        // Показываем внешние элементы
+        document.querySelector('.menu-bar').style.display = '';
+        document.querySelector('.level-select').style.display = '';
+        document.querySelector('.info').style.display = '';
+        if (isMobile) document.querySelector('.controls-panel').style.display = 'none';
+        else document.querySelector('.controls-panel').style.display = 'flex';
+        
+        fullscreenBtn.textContent = '⛶';
+        fullscreenBtn.title = 'Полноэкранный режим';
+        isFullscreen = false;
+        
+        // Скрываем кнопки внутри game-wrapper
+        document.getElementById('touchControls').style.display = isMobile ? 'block' : 'none';
+        
+        canvas.width = W;
+        canvas.height = H;
+        canvas.style.width = '';
+        canvas.style.height = '';
+      } else {
+        // Выход из ПК полноэкранного режима
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        gameWrapper.classList.remove('fullscreen');
+        fullscreenBtn.textContent = '⛶';
+        isFullscreen = false;
+        canvas.width = W;
+        canvas.height = H;
+      }
     }
+  }
+
+  function resizeMobileCanvas() {
+    if (!isMobileFullscreen) return;
+    const gameWrapper = document.getElementById('gameWrapper');
+    const maxWidth = gameWrapper.clientWidth;
+    const maxHeight = gameWrapper.clientHeight;
+    const ratio = W / H;
+    
+    let newWidth, newHeight;
+    if (maxWidth / maxHeight > ratio) {
+      newHeight = maxHeight;
+      newWidth = newHeight * ratio;
+    } else {
+      newWidth = maxWidth;
+      newHeight = newWidth / ratio;
+    }
+    
+    canvas.style.width = newWidth + 'px';
+    canvas.style.height = newHeight + 'px';
   }
 
   function handleFullscreenChange() {
-    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-      document.getElementById('gameWrapper').classList.remove('fullscreen');
+    if (!document.fullscreenElement && !document.webkitFullscreenElement && !isMobileFullscreen) {
+      const gameWrapper = document.getElementById('gameWrapper');
+      gameWrapper.classList.remove('fullscreen');
       document.getElementById('fullscreenBtn').textContent = '⛶';
       isFullscreen = false;
-      canvas.width = W; canvas.height = H;
+      canvas.width = W;
+      canvas.height = H;
     }
   }
 
-  // ===== ИГРОВАЯ ЛОГИКА (ЕДИНАЯ ДЛЯ ВСЕХ) =====
+  // ===== ИГРОВАЯ ЛОГИКА =====
   const car={
     x:200, y:0, vx:0, vy:0, angle:0, angularVelocity:0, 
     width:65, height:30, wheelRotation:0, onGround:true,
@@ -618,9 +706,9 @@
 
   function generateTerrainForLevel(levelIndex){
     terrainPoints.length=0; coins_list.length=0; fuelCans_list.length=0;
-    const config=levelConfigs[levelIndex]; levelConfig=config;
-    TERRAIN_LENGTH=config.length; TERRAIN_SEGMENTS=Math.floor(config.length*1.5); finishLineX=TERRAIN_LENGTH-500;
-    generateTerrainSegment(0,TERRAIN_LENGTH,config);
+    levelConfig=levelConfigs[levelIndex];
+    TERRAIN_LENGTH=levelConfig.length; TERRAIN_SEGMENTS=Math.floor(levelConfig.length*1.5); finishLineX=TERRAIN_LENGTH-500;
+    generateTerrainSegment(0,TERRAIN_LENGTH,levelConfig);
   }
 
   function generateEndlessTerrain(){
@@ -641,48 +729,25 @@
       const x=startX+(i/segSegments)*segLength;
       let y=baseY;
       if(x<flatStart) y=baseY;
-      else if(x<transitionEnd&&startX===0){
-        const t=(x-flatStart)/(transitionEnd-flatStart);
-        y=baseY-(t*t*(3-2*t))*transitionDrop;
-      }else{
+      else if(x<transitionEnd&&startX===0){const t=(x-flatStart)/(transitionEnd-flatStart);y=baseY-(t*t*(3-2*t))*transitionDrop;}
+      else{
         y+=Math.sin(x*0.0004)*50*jumpPower+Math.sin(x*0.0009+1.5)*55*jumpPower+Math.sin(x*0.0015+3)*40*jumpPower+Math.cos(x*0.0007+0.5)*45*jumpPower+Math.sin(x*0.002+1)*25*jumpPower;
-        for(let r=flatStart+500;r<endX;r+=400+diff*15){
-          const dist=Math.abs(x-r);
-          if(dist<250) y-=Math.exp(-Math.pow(dist/150,2))*(60+diff*8)*jumpPower*(isHardLevel?0.5:1.0);
-        }
-        if(diff>=5){
-          for(let d=flatStart+800;d<endX;d+=600){
-            const dist=Math.abs(x-d);
-            if(dist<350) y-=Math.exp(-Math.pow(dist/180,2))*(70+diff*10)*jumpPower*(isHardLevel?0.5:1.0);
-          }
-        }
-        for(let b=flatStart+300;b<endX;b+=200+diff*10){
-          const dist=Math.abs(x-b);
-          if(dist<50) y-=Math.exp(-Math.pow(dist/30,2))*(20+diff*3)*jumpPower*(isHardLevel?0.4:1.0);
-        }
+        for(let r=flatStart+500;r<endX;r+=400+diff*15){const dist=Math.abs(x-r);if(dist<250)y-=Math.exp(-Math.pow(dist/150,2))*(60+diff*8)*jumpPower*(isHardLevel?0.5:1.0);}
+        if(diff>=5){for(let d=flatStart+800;d<endX;d+=600){const dist=Math.abs(x-d);if(dist<350)y-=Math.exp(-Math.pow(dist/180,2))*(70+diff*10)*jumpPower*(isHardLevel?0.5:1.0);}}
+        for(let b=flatStart+300;b<endX;b+=200+diff*10){const dist=Math.abs(x-b);if(dist<50)y-=Math.exp(-Math.pow(dist/30,2))*(20+diff*3)*jumpPower*(isHardLevel?0.4:1.0);}
       }
-      if(terrainPoints.length>0){
-        const prevY=terrainPoints[terrainPoints.length-1].y;
-        const maxChange=isHardLevel?4+diff*0.5:8+diff*1.5;
-        if(Math.abs(y-prevY)>maxChange) y=prevY+Math.sign(y-prevY)*maxChange;
-      }
+      if(terrainPoints.length>0){const prevY=terrainPoints[terrainPoints.length-1].y;const maxChange=isHardLevel?4+diff*0.5:8+diff*1.5;if(Math.abs(y-prevY)>maxChange)y=prevY+Math.sign(y-prevY)*maxChange;}
       y=Math.max(50,Math.min(H-25,y));
       terrainPoints.push({x,y});
     }
    
     if(startX===0){
-      for(let i=0;i<(config.coins||15);i++){
-        const cx=flatStart+100+(i/(config.coins||15))*(endX-flatStart-200);
-        coins_list.push({x:cx,y:Math.max(40,getTerrainY(cx)-8-Math.random()*15),collected:false});
-      }
+      for(let i=0;i<(config.coins||15);i++){const cx=flatStart+100+(i/(config.coins||15))*(endX-flatStart-200);coins_list.push({x:cx,y:Math.max(40,getTerrainY(cx)-8-Math.random()*15),collected:false});}
       const fuelCount=config.fuelCans||3;
-      if(fuelCount>0){
-        const segment=(endX-flatStart-400)/(fuelCount+1);
-        for(let i=0;i<fuelCount;i++) fuelCans_list.push({x:flatStart+200+(i+1)*segment+Math.random()*200,y:getTerrainY(flatStart+200+(i+1)*segment)-18,collected:false});
-      }
+      if(fuelCount>0){const segment=(endX-flatStart-400)/(fuelCount+1);for(let i=0;i<fuelCount;i++){const fx=flatStart+200+(i+1)*segment+Math.random()*200;fuelCans_list.push({x:fx,y:getTerrainY(fx)-18,collected:false});}}
     }else{
-      if(Math.random()<0.3) coins_list.push({x:startX+Math.random()*segLength,y:Math.max(40,getTerrainY(startX+Math.random()*segLength)-8-Math.random()*15),collected:false});
-      if(Math.random()<0.06) fuelCans_list.push({x:startX+Math.random()*segLength,y:getTerrainY(startX+Math.random()*segLength)-18,collected:false});
+      if(Math.random()<0.3){const cx=startX+Math.random()*segLength;coins_list.push({x:cx,y:Math.max(40,getTerrainY(cx)-8-Math.random()*15),collected:false});}
+      if(Math.random()<0.06){const fx=startX+Math.random()*segLength;fuelCans_list.push({x:fx,y:getTerrainY(fx)-18,collected:false});}
     }
   }
 
@@ -711,8 +776,8 @@
     car.wheel2.x=car.x+car.width*0.38;car.wheel2.y=gy;car.wheel2.onGround=true;car.wheel2.groundY=gy;
     gameOver=false;outOfFuel=false;levelComplete=false;gameStarted=false;distance=0;coins=0;
     fuel=getFuelCapacity();cameraX=0;particles=[];airTime=0;maxAirTime=0;
-    for(const c of coins_list)c.collected=false;
-    for(const c of fuelCans_list)c.collected=false;
+    coins_list.forEach(c=>c.collected=false);
+    fuelCans_list.forEach(c=>c.collected=false);
     updateAllDisplays();
     ['gameoverOverlay','outOfFuelOverlay','winOverlay'].forEach(id=>document.getElementById(id).classList.remove('active'));
   }
@@ -721,8 +786,7 @@
     if(!levelComplete&&!isEndless){
       levelComplete=true;totalCoins+=coins;saveGameData(true);
       document.getElementById('winStats').textContent=`Дист: ${Math.floor(distance)}м | Монеты: ${coins} | Всего: ${totalCoins}`;
-      document.getElementById('winOverlay').classList.add('active');
-      updateAllDisplays();
+      document.getElementById('winOverlay').classList.add('active');updateAllDisplays();
     }
   }
 
@@ -730,8 +794,7 @@
     if(!gameOver&&!levelComplete&&gameStarted){
       gameOver=true;totalCoins+=coins;saveGameData(true);
       document.getElementById('gameoverStats').textContent=`Дист: ${Math.floor(distance)}м | Монеты: ${coins} | Всего: ${totalCoins}`;
-      document.getElementById('gameoverOverlay').classList.add('active');
-      updateAllDisplays();
+      document.getElementById('gameoverOverlay').classList.add('active');updateAllDisplays();
     }
   }
 
@@ -739,8 +802,7 @@
     if(!outOfFuel&&!gameOver&&!levelComplete){
       outOfFuel=true;totalCoins+=coins;saveGameData(true);
       document.getElementById('fuelStats').textContent=`Дист: ${Math.floor(distance)}м | Монеты: ${coins} | Всего: ${totalCoins}`;
-      document.getElementById('outOfFuelOverlay').classList.add('active');
-      updateAllDisplays();
+      document.getElementById('outOfFuelOverlay').classList.add('active');updateAllDisplays();
     }
   }
 
@@ -785,10 +847,7 @@
       airTime=0;
       car.angularVelocity+=(slope-car.angle)*0.05*tireGrip;
       car.angularVelocity*=0.9;
-      if(car.vx>3){
-        const drop=getTerrainY(car.x)-getTerrainY(car.x+car.vx*4);
-        if(drop>8){car.vy-=drop*0.025*(levelConfig.jumps||0.8);if(drop>12)spawnParticles(car.x,getTerrainY(car.x),3,'#ffffff',3);}
-      }
+      if(car.vx>3){const drop=getTerrainY(car.x)-getTerrainY(car.x+car.vx*4);if(drop>8){car.vy-=drop*0.025*(levelConfig.jumps||0.8);if(drop>12)spawnParticles(car.x,getTerrainY(car.x),3,'#ffffff',3);}}
     }
    
     car.vx+=ef;car.vx*=AIR_FRICTION;car.vy+=GRAVITY;
@@ -959,21 +1018,20 @@
   document.addEventListener('visibilitychange',()=>{if(document.hidden)saveGameData(true);});
   document.addEventListener('fullscreenchange',handleFullscreenChange);
   document.addEventListener('webkitfullscreenchange',handleFullscreenChange);
+  window.addEventListener('resize',()=>{if(isMobileFullscreen)resizeMobileCanvas();});
+  window.addEventListener('orientationchange',()=>{if(isMobileFullscreen)setTimeout(resizeMobileCanvas,300);});
   setInterval(()=>{if(!gameOver&&!outOfFuel&&!levelComplete&&gameStarted)saveGameData(false);},30000);
 
   window.addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='KeyR')resetCar();if(e.code==='KeyF')toggleFullscreen();e.preventDefault();});
   window.addEventListener('keyup',e=>{keys[e.code]=false;e.preventDefault();});
  
-  // ЕДИНАЯ ОБРАБОТКА СЕНСОРНЫХ КНОПОК
   function setupBtn(id,code){
     const btn=document.getElementById(id);
     if(!btn)return;
-    const activate=()=>{keys[code]=true;};
-    const deactivate=()=>{keys[code]=false;};
-    btn.addEventListener('pointerdown',e=>{e.preventDefault();activate();});
-    btn.addEventListener('pointerup',e=>{e.preventDefault();deactivate();});
-    btn.addEventListener('pointerleave',deactivate);
-    btn.addEventListener('pointercancel',deactivate);
+    btn.addEventListener('pointerdown',e=>{e.preventDefault();keys[code]=true;});
+    btn.addEventListener('pointerup',e=>{e.preventDefault();keys[code]=false;});
+    btn.addEventListener('pointerleave',()=>{keys[code]=false;});
+    btn.addEventListener('pointercancel',()=>{keys[code]=false;});
     btn.addEventListener('contextmenu',e=>e.preventDefault());
   }
   setupBtn('btnGas','ArrowRight');
@@ -992,27 +1050,6 @@
   document.getElementById('confirmResetBtn').addEventListener('click',()=>{resetAllProgress();document.getElementById('resetConfirmOverlay').classList.remove('active');});
   document.getElementById('cancelResetBtn').addEventListener('click',()=>document.getElementById('resetConfirmOverlay').classList.remove('active'));
 
-  // Оптимизация размера канваса для мобильных
-  function optimizeCanvasSize() {
-    const maxWidth = window.innerWidth - 6;
-    const maxHeight = window.innerHeight - 150; // Место для UI
-    const ratio = W / H;
-    
-    if (maxWidth / maxHeight > ratio) {
-      canvas.style.width = (maxHeight * ratio) + 'px';
-      canvas.style.height = maxHeight + 'px';
-    } else {
-      canvas.style.width = maxWidth + 'px';
-      canvas.style.height = (maxWidth / ratio) + 'px';
-    }
-  }
-  
-  if (isMobile) {
-    optimizeCanvasSize();
-    window.addEventListener('resize', optimizeCanvasSize);
-    window.addEventListener('orientationchange', () => setTimeout(optimizeCanvasSize, 300));
-  }
-
   // Инициализация
   loadGameData();
   generateTerrainForLevel(0);
@@ -1021,13 +1058,11 @@
   updateLevelButtons();
   gameLoop();
  
-  console.log('🚗 Hill Climb Racing v2.0 - Единая физика для всех устройств');
+  console.log('🚗 Hill Climb Racing v2.1 - Полноэкранный режим с кнопками поверх игры');
+  console.log('  - На телефоне: горизонтальный фулскрин + кнопки внутри игры');
+  console.log('  - На ПК: обычный полноэкранный режим');
   console.log('  - Скорость: ~80 км/ч');
-  console.log('  - Сила взлёта: уменьшена (0.025)');
-  console.log('  - Разгон: плавный, двухступенчатый');
-  console.log('  - Управление: оптимизировано для ПК и телефонов');
 })();
 </script>
 </body>
 </html>
-       
