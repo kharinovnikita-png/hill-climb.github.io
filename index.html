@@ -14,7 +14,6 @@
       min-height: 100vh;
       min-height: 100dvh;
       font-family: 'Arial', sans-serif;
-      flex-direction: column;
       touch-action: manipulation;
       user-select: none;
       -webkit-user-select: none;
@@ -27,10 +26,9 @@
       display: flex; 
       flex-direction: column; 
       align-items: center; 
-      gap: 3px; 
-      padding: 3px;
+      gap: 2px; 
+      padding: 2px;
       width: 100%;
-      max-width: 100vw;
       height: 100vh;
       height: 100dvh;
     }
@@ -40,13 +38,17 @@
       overflow: hidden;
       border: 2px solid #ff4400;
       position: relative;
-      flex-shrink: 0;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       background: #000;
+      min-height: 0;
     }
     canvas { 
       display: block; 
       max-width: 100%; 
-      height: auto;
+      max-height: 100%;
       touch-action: manipulation;
     }
     .fullscreen-btn {
@@ -69,7 +71,9 @@
       color: #ffaa00; font-weight: bold; font-size: 0.7rem;
       background: #111; padding: 4px 8px; border-radius: 6px; border: 1px solid #ff4400;
       z-index: 5;
+      transition: opacity 0.3s;
     }
+    .menu-bar.hidden { opacity: 0; pointer-events: none; }
     .menu-bar span { color: #ffd700; }
     .garage-btn {
       background: #ff4400; color: #000; border: none;
@@ -81,7 +85,12 @@
       padding: 3px 8px; font-weight: bold; border-radius: 6px;
       cursor: pointer; font-size: 0.7rem;
     }
-    .level-select { display: flex; flex-wrap: wrap; gap: 2px; justify-content: center; margin: 1px 0; max-width: 100%; z-index: 5; }
+    .level-select { 
+      display: flex; flex-wrap: wrap; gap: 2px; justify-content: center; 
+      margin: 1px 0; max-width: 100%; z-index: 5;
+      transition: opacity 0.3s;
+    }
+    .level-select.hidden { opacity: 0; pointer-events: none; }
     .level-btn {
       padding: 2px 5px; background: #111; color: #ff4400;
       border: 1px solid #ff4400; border-radius: 3px;
@@ -90,8 +99,16 @@
     .level-btn.active { background: #cc3300; color: #fff; }
     .level-btn.endless { background: #220044; color: #cc88ff; border-color: #cc88ff; }
     .level-btn.endless.active { background: #6600cc; color: #fff; }
-    .info { text-align: center; color: #ff4400; font-weight: bold; font-size: 0.65rem; z-index: 5; }
-    .controls-panel { display: flex; gap: 3px; flex-wrap: wrap; justify-content: center; color: #666; font-size: 0.5rem; z-index: 5; }
+    .info { 
+      text-align: center; color: #ff4400; font-weight: bold; font-size: 0.65rem; z-index: 5;
+      transition: opacity 0.3s;
+    }
+    .info.hidden { opacity: 0; }
+    .controls-panel { 
+      display: flex; gap: 3px; flex-wrap: wrap; justify-content: center; 
+      color: #666; font-size: 0.5rem; z-index: 5;
+      transition: opacity 0.3s;
+    }
     .controls-panel span { background: #0a0a0a; padding: 1px 4px; border-radius: 4px; border: 1px solid #222; }
     
     /* СЕНСОРНЫЕ КНОПКИ ПОВЕРХ ИГРЫ */
@@ -265,43 +282,7 @@
     .save-indicator { color: #0f0; font-size: 0.6rem; opacity: 0; transition: opacity 0.3s; }
     .save-indicator.show { opacity: 1; }
     
-    /* ПОЛНОЭКРАННЫЙ РЕЖИМ ДЛЯ ТЕЛЕФОНОВ */
-    .game-wrapper.fullscreen-mobile {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      width: 100dvw;
-      height: 100dvh;
-      z-index: 9999;
-      border: none;
-      border-radius: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #000;
-      margin: 0;
-      padding: 0;
-    }
-    .game-wrapper.fullscreen-mobile canvas {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-    .game-wrapper.fullscreen-mobile .fullscreen-btn {
-      top: 10px;
-      right: 10px;
-      font-size: 0.8rem;
-      padding: 6px 12px;
-      z-index: 30;
-    }
-    .game-wrapper.fullscreen-mobile .touch-controls {
-      display: block;
-      bottom: 15px;
-    }
-    
-    /* ПК полноэкранный режим */
+    /* ПОЛНОЭКРАННЫЙ РЕЖИМ */
     .game-wrapper.fullscreen {
       position: fixed;
       top: 0;
@@ -311,19 +292,18 @@
       z-index: 9999;
       border: none;
       border-radius: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #000;
+      margin: 0;
+      padding: 0;
     }
     .game-wrapper.fullscreen canvas { width: 100%; height: 100%; object-fit: contain; }
+    .game-wrapper.fullscreen .fullscreen-btn { top: 10px; right: 10px; z-index: 30; }
     
     @media (max-width: 768px) {
       .touch-controls { display: block; }
       .controls-panel { display: none; }
       .menu-bar { font-size: 0.6rem; gap: 3px; padding: 3px 5px; }
       .garage-btn, .reset-btn { font-size: 0.6rem; padding: 2px 6px; }
-      .game-container { gap: 2px; padding: 2px; }
+      .game-container { gap: 1px; padding: 1px; }
       .game-wrapper { border-width: 1px; }
     }
     
@@ -335,7 +315,7 @@
 </head>
 <body>
 <div class="game-container">
-  <div class="menu-bar">
+  <div class="menu-bar" id="menuBar">
     🏆 <span id="totalCoinsDisplay">0</span>
     🚗 <span id="currentCarDisplay">Джип</span>
     <button class="garage-btn" id="openGarageBtn">🔧 ГАРАЖ</button>
@@ -410,7 +390,6 @@
   let currentCarIndex=0;
   let saveTimeout = null;
   let isFullscreen = false;
-  let isMobileFullscreen = false;
 
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
                    (navigator.maxTouchPoints > 1 && window.innerWidth < 1024);
@@ -471,7 +450,7 @@
       const data = {
         totalCoins, currentCarIndex,
         cars: carsConfig.map(c => ({ unlocked: c.unlocked, upgradeLevels: c.upgradeLevels })),
-        timestamp: Date.now(), version: '2.1'
+        timestamp: Date.now(), version: '2.2'
       };
       localStorage.setItem('hcr_garage', JSON.stringify(data));
       showSaveIndicator('saveIndicator');
@@ -555,6 +534,21 @@
   function getTireGrip() { return carsConfig[currentCarIndex].stats.tires || 1.0; }
   function getFuelCapacity() { return (isEndless ? 60 : (levelConfig.fuel || 100)) * (carsConfig[currentCarIndex].stats.fuel || 1.0); }
 
+  // ===== УПРАВЛЕНИЕ ВИДИМОСТЬЮ UI =====
+  function hideGameUI() {
+    document.getElementById('menuBar').classList.add('hidden');
+    document.getElementById('levelButtons').classList.add('hidden');
+    document.getElementById('infoDisplay').classList.add('hidden');
+    if (!isMobile) document.getElementById('desktopControls').style.opacity = '0';
+  }
+
+  function showGameUI() {
+    document.getElementById('menuBar').classList.remove('hidden');
+    document.getElementById('levelButtons').classList.remove('hidden');
+    document.getElementById('infoDisplay').classList.remove('hidden');
+    if (!isMobile) document.getElementById('desktopControls').style.opacity = '1';
+  }
+
   // ===== ПОЛНОЭКРАННЫЙ РЕЖИМ =====
   function lockOrientation() {
     if (isMobile && screen.orientation && screen.orientation.lock) {
@@ -574,28 +568,17 @@
     
     if (!isFullscreen) {
       if (isMobile) {
-        // Мобильный полноэкранный режим
         lockOrientation();
-        gameWrapper.classList.add('fullscreen-mobile');
-        isMobileFullscreen = true;
-        
-        // Скрываем внешние элементы
-        document.querySelector('.menu-bar').style.display = 'none';
-        document.querySelector('.level-select').style.display = 'none';
-        document.querySelector('.info').style.display = 'none';
-        document.querySelector('.controls-panel').style.display = 'none';
-        
+        gameWrapper.classList.add('fullscreen');
         fullscreenBtn.textContent = '✕';
         fullscreenBtn.title = 'Выйти';
         isFullscreen = true;
         
-        // Показываем кнопки управления внутри game-wrapper
-        document.getElementById('touchControls').style.display = 'block';
+        // При входе в фулскрин показываем UI
+        showGameUI();
         
-        // Оптимизируем размер канваса
         resizeMobileCanvas();
       } else {
-        // ПК полноэкранный режим
         if (gameWrapper.requestFullscreen) gameWrapper.requestFullscreen();
         else if (gameWrapper.webkitRequestFullscreen) gameWrapper.webkitRequestFullscreen();
         gameWrapper.classList.add('fullscreen');
@@ -604,31 +587,20 @@
       }
     } else {
       if (isMobile) {
-        // Выход из мобильного полноэкранного режима
         unlockOrientation();
-        gameWrapper.classList.remove('fullscreen-mobile');
-        isMobileFullscreen = false;
-        
-        // Показываем внешние элементы
-        document.querySelector('.menu-bar').style.display = '';
-        document.querySelector('.level-select').style.display = '';
-        document.querySelector('.info').style.display = '';
-        if (isMobile) document.querySelector('.controls-panel').style.display = 'none';
-        else document.querySelector('.controls-panel').style.display = 'flex';
-        
+        gameWrapper.classList.remove('fullscreen');
         fullscreenBtn.textContent = '⛶';
         fullscreenBtn.title = 'Полноэкранный режим';
         isFullscreen = false;
         
-        // Скрываем кнопки внутри game-wrapper
-        document.getElementById('touchControls').style.display = isMobile ? 'block' : 'none';
+        // При выходе показываем UI
+        showGameUI();
         
         canvas.width = W;
         canvas.height = H;
         canvas.style.width = '';
         canvas.style.height = '';
       } else {
-        // Выход из ПК полноэкранного режима
         if (document.exitFullscreen) document.exitFullscreen();
         else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
         gameWrapper.classList.remove('fullscreen');
@@ -641,7 +613,7 @@
   }
 
   function resizeMobileCanvas() {
-    if (!isMobileFullscreen) return;
+    if (!isFullscreen || !isMobile) return;
     const gameWrapper = document.getElementById('gameWrapper');
     const maxWidth = gameWrapper.clientWidth;
     const maxHeight = gameWrapper.clientHeight;
@@ -661,9 +633,8 @@
   }
 
   function handleFullscreenChange() {
-    if (!document.fullscreenElement && !document.webkitFullscreenElement && !isMobileFullscreen) {
-      const gameWrapper = document.getElementById('gameWrapper');
-      gameWrapper.classList.remove('fullscreen');
+    if (!document.fullscreenElement && !document.webkitFullscreenElement && !isMobile) {
+      document.getElementById('gameWrapper').classList.remove('fullscreen');
       document.getElementById('fullscreenBtn').textContent = '⛶';
       isFullscreen = false;
       canvas.width = W;
@@ -766,8 +737,19 @@
     return{x:car.x+hx*Math.cos(car.angle)-hy*Math.sin(car.angle),y:car.y+hx*Math.sin(car.angle)+hy*Math.cos(car.angle)};
   }
 
-  function startLevel(n){currentLevel=n;isEndless=false;generateTerrainForLevel(n-1);resetCar();document.getElementById('levelDisplay').textContent=n;updateAllDisplays();updateLevelButtons();}
-  function startEndless(){isEndless=true;currentLevel=-1;generateEndlessTerrain();resetCar();updateAllDisplays();updateLevelButtons();}
+  function startLevel(n){
+    currentLevel=n;isEndless=false;generateTerrainForLevel(n-1);resetCar();
+    document.getElementById('levelDisplay').textContent=n;
+    updateAllDisplays();updateLevelButtons();
+    // Скрываем UI при старте игры на мобильных в фулскрине
+    if (isMobile && isFullscreen) hideGameUI();
+  }
+
+  function startEndless(){
+    isEndless=true;currentLevel=-1;generateEndlessTerrain();resetCar();
+    updateAllDisplays();updateLevelButtons();
+    if (isMobile && isFullscreen) hideGameUI();
+  }
 
   function resetCar(){
     const gy=getTerrainY(200);
@@ -780,6 +762,8 @@
     fuelCans_list.forEach(c=>c.collected=false);
     updateAllDisplays();
     ['gameoverOverlay','outOfFuelOverlay','winOverlay'].forEach(id=>document.getElementById(id).classList.remove('active'));
+    // Показываем UI при сбросе
+    if (isMobile && isFullscreen) showGameUI();
   }
 
   function completeLevel(){
@@ -787,6 +771,8 @@
       levelComplete=true;totalCoins+=coins;saveGameData(true);
       document.getElementById('winStats').textContent=`Дист: ${Math.floor(distance)}м | Монеты: ${coins} | Всего: ${totalCoins}`;
       document.getElementById('winOverlay').classList.add('active');updateAllDisplays();
+      // Показываем UI после завершения уровня
+      if (isMobile && isFullscreen) showGameUI();
     }
   }
 
@@ -795,6 +781,7 @@
       gameOver=true;totalCoins+=coins;saveGameData(true);
       document.getElementById('gameoverStats').textContent=`Дист: ${Math.floor(distance)}м | Монеты: ${coins} | Всего: ${totalCoins}`;
       document.getElementById('gameoverOverlay').classList.add('active');updateAllDisplays();
+      if (isMobile && isFullscreen) showGameUI();
     }
   }
 
@@ -803,6 +790,7 @@
       outOfFuel=true;totalCoins+=coins;saveGameData(true);
       document.getElementById('fuelStats').textContent=`Дист: ${Math.floor(distance)}м | Монеты: ${coins} | Всего: ${totalCoins}`;
       document.getElementById('outOfFuelOverlay').classList.add('active');updateAllDisplays();
+      if (isMobile && isFullscreen) showGameUI();
     }
   }
 
@@ -812,6 +800,12 @@
 
   function updateCar(){
     if(gameOver||outOfFuel||levelComplete)return;
+    
+    // Скрываем UI во время активной игры на мобильных в фулскрине
+    if (isMobile && isFullscreen && gameStarted && !gameOver && !outOfFuel && !levelComplete) {
+      if (!document.getElementById('menuBar').classList.contains('hidden')) hideGameUI();
+    }
+    
     const enginePower=getEnginePower(), tireGrip=getTireGrip(), currentMaxSpeed=MAX_SPEED*tireGrip;
    
     if(Math.abs(car.vx)>0.1)fuel-=0.004+Math.abs(car.vx)*0.0025;else fuel-=0.0009;
@@ -1014,12 +1008,30 @@
   function render(){ctx.clearRect(0,0,W,H);drawSky();drawTerrain();drawCoins();drawFuelCans();drawParticles();drawCar();drawUI();}
   function gameLoop(){updateCar();updateParticles();updateCamera();render();requestAnimationFrame(gameLoop);}
 
+  // Инициализация для мобильных - сразу горизонтальный режим
+  function initMobile() {
+    if (isMobile) {
+      lockOrientation();
+      // Запускаем в полноэкранном режиме сразу
+      const gameWrapper = document.getElementById('gameWrapper');
+      gameWrapper.classList.add('fullscreen');
+      document.getElementById('fullscreenBtn').textContent = '✕';
+      document.getElementById('fullscreenBtn').title = 'Выйти';
+      isFullscreen = true;
+      
+      // Показываем UI при запуске
+      showGameUI();
+      
+      resizeMobileCanvas();
+    }
+  }
+
   window.addEventListener('beforeunload',()=>saveGameData(true));
   document.addEventListener('visibilitychange',()=>{if(document.hidden)saveGameData(true);});
   document.addEventListener('fullscreenchange',handleFullscreenChange);
   document.addEventListener('webkitfullscreenchange',handleFullscreenChange);
-  window.addEventListener('resize',()=>{if(isMobileFullscreen)resizeMobileCanvas();});
-  window.addEventListener('orientationchange',()=>{if(isMobileFullscreen)setTimeout(resizeMobileCanvas,300);});
+  window.addEventListener('resize',()=>{if(isFullscreen&&isMobile)resizeMobileCanvas();});
+  window.addEventListener('orientationchange',()=>{if(isFullscreen&&isMobile)setTimeout(resizeMobileCanvas,300);});
   setInterval(()=>{if(!gameOver&&!outOfFuel&&!levelComplete&&gameStarted)saveGameData(false);},30000);
 
   window.addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='KeyR')resetCar();if(e.code==='KeyF')toggleFullscreen();e.preventDefault();});
@@ -1056,11 +1068,13 @@
   resetCar();
   updateAllDisplays();
   updateLevelButtons();
+  initMobile(); // Сразу горизонтальный режим для телефонов
   gameLoop();
  
-  console.log('🚗 Hill Climb Racing v2.1 - Полноэкранный режим с кнопками поверх игры');
-  console.log('  - На телефоне: горизонтальный фулскрин + кнопки внутри игры');
-  console.log('  - На ПК: обычный полноэкранный режим');
+  console.log('🚗 Hill Climb Racing v2.2');
+  console.log('  - Телефон: сразу горизонтальный режим');
+  console.log('  - UI виден в покое, скрывается во время игры');
+  console.log('  - После окончания уровня UI появляется снова');
   console.log('  - Скорость: ~80 км/ч');
 })();
 </script>
