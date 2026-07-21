@@ -103,10 +103,10 @@
       touch-action: manipulation;
     }
 
-    /* Кнопка полноэкранного режима – смещена и увеличена */
+    /* Кнопка полноэкранного режима – смещена */
     .fullscreen-btn {
       position: absolute;
-      top: 35px;       /* ниже мобильной панели */
+      top: 35px;
       right: 10px;
       background: rgba(0,0,0,0.7);
       color: #fff;
@@ -115,7 +115,7 @@
       border-radius: 6px;
       cursor: pointer;
       font-size: 0.8rem;
-      z-index: 32;     /* выше панелей */
+      z-index: 32;
       transition: all 0.2s;
     }
     .fullscreen-btn:active { background: #ff4400; color: #000; }
@@ -165,7 +165,7 @@
     .mobile-levels-row {
       display: none;
       position: absolute;
-      top: 30px;      /* под верхней панелью */
+      top: 30px;
       left: 0;
       right: 0;
       background: rgba(0,0,0,0.7);
@@ -191,31 +191,31 @@
     .mobile-levels-row button.active { background: #cc3300; color: #fff; }
     .mobile-levels-row button.endless { background: #220044; color: #cc88ff; border-color: #cc88ff; }
 
-    /* Увеличенные сенсорные кнопки */
+    /* Сенсорные кнопки – подняты выше, увеличены */
     .touch-controls { 
       display: none; 
       position: absolute;
-      bottom: 10px;
+      bottom: 60px;
       left: 0;
       right: 0;
-      z-index: 20;
+      z-index: 35;
       pointer-events: none;
     }
     .touch-controls-inner {
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
-      padding: 0 15px;
+      padding: 0 20px;
       pointer-events: none;
     }
     .touch-pedal {
-      width: 60px;
-      height: 60px;
+      width: 70px;
+      height: 70px;
       border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.3);
-      background: rgba(0,0,0,0.4);
-      color: rgba(255,255,255,0.8);
-      font-size: 22px;
+      border: 2px solid rgba(255,255,255,0.4);
+      background: rgba(0,0,0,0.5);
+      color: rgba(255,255,255,0.9);
+      font-size: 26px;
       font-weight: bold;
       display: flex;
       align-items: center;
@@ -229,19 +229,19 @@
       -webkit-backdrop-filter: blur(3px);
     }
     .touch-pedal:active { transform: scale(0.9); color: #fff; }
-    .touch-pedal.gas { border-color: rgba(0,255,0,0.4); }
-    .touch-pedal.gas:active { background: rgba(0,180,0,0.6); border-color: rgba(0,255,0,0.7); }
-    .touch-pedal.brake { border-color: rgba(255,0,0,0.4); }
-    .touch-pedal.brake:active { background: rgba(180,0,0,0.6); border-color: rgba(255,0,0,0.7); }
-    .touch-tilt-group { display: flex; gap: 10px; pointer-events: auto; }
+    .touch-pedal.gas { border-color: rgba(0,255,0,0.5); }
+    .touch-pedal.gas:active { background: rgba(0,180,0,0.7); border-color: rgba(0,255,0,0.8); }
+    .touch-pedal.brake { border-color: rgba(255,0,0,0.5); }
+    .touch-pedal.brake:active { background: rgba(180,0,0,0.7); border-color: rgba(255,0,0,0.8); }
+    .touch-tilt-group { display: flex; gap: 12px; pointer-events: auto; }
     .touch-tilt-btn {
-      width: 44px;
-      height: 44px;
-      border-radius: 10px;
-      border: 2px solid rgba(255,255,255,0.3);
-      background: rgba(0,0,0,0.35);
-      color: rgba(255,255,255,0.7);
-      font-size: 18px;
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      border: 2px solid rgba(255,255,255,0.4);
+      background: rgba(0,0,0,0.45);
+      color: rgba(255,255,255,0.8);
+      font-size: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -253,8 +253,8 @@
       -webkit-backdrop-filter: blur(3px);
     }
     .touch-tilt-btn:active {
-      background: rgba(255,150,0,0.6);
-      border-color: rgba(255,150,0,0.8);
+      background: rgba(255,150,0,0.7);
+      border-color: rgba(255,150,0,0.9);
       transform: scale(0.9);
       color: #fff;
     }
@@ -307,7 +307,7 @@
       }
     }
 
-    /* Остальные стили (оверлеи, гараж) – как в предыдущей полной версии */
+    /* Остальные стили (оверлеи, гараж) */
     .game-overlay {
       display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.85); z-index: 50; justify-content: center; align-items: center;
@@ -573,7 +573,7 @@
           localStorage.setItem('hcr_garage', JSON.stringify({
             totalCoins, currentCarIndex,
             cars: carsConfig.map(c => ({ unlocked: c.unlocked, upgradeLevels: c.upgradeLevels })),
-            version: '4.1'
+            version: '4.2'
           }));
           document.getElementById('saveIndicator')?.classList.add('show');
           setTimeout(() => document.getElementById('saveIndicator')?.classList.remove('show'), 2000);
