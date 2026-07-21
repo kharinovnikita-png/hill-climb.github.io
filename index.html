@@ -103,7 +103,7 @@
       touch-action: manipulation;
     }
 
-    /* Кнопка полноэкранного режима – смещена */
+    /* Кнопка полноэкранного режима */
     .fullscreen-btn {
       position: absolute;
       top: 35px;
@@ -191,7 +191,7 @@
     .mobile-levels-row button.active { background: #cc3300; color: #fff; }
     .mobile-levels-row button.endless { background: #220044; color: #cc88ff; border-color: #cc88ff; }
 
-    /* Сенсорные кнопки – подняты выше, увеличены */
+    /* Сенсорные кнопки – общие */
     .touch-controls { 
       display: none; 
       position: absolute;
@@ -304,6 +304,13 @@
         right: 5px;
         padding: 6px 12px;
         font-size: 0.8rem;
+      }
+    }
+
+    /* Дополнительный подъём кнопок в полноэкранном горизонтальном режиме */
+    @media (orientation: landscape) {
+      .game-container.fullscreen-mode .touch-controls {
+        bottom: 120px;  /* ещё выше, чтобы не перекрывались системными панелями */
       }
     }
 
