@@ -286,7 +286,6 @@
       .desktop-info { display: block; }
     }
 
-    /* Остальные стили */
     .game-overlay {
       display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.85); z-index: 50; justify-content: center; align-items: center;
@@ -476,19 +475,20 @@
 <button id="installBtn" class="install-btn">📲 Установить игру</button>
 
 <script>
-  // ===== PWA install =====
+  // PWA install prompt
   let deferredPrompt;
   const installBtn = document.getElementById('installBtn');
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
     installBtn.classList.add('show');
+    console.log('beforeinstallprompt fired');
   });
   installBtn.addEventListener('click', async () => {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
-    console.log(`User response: ${outcome}`);
+    console.log('Install outcome:', outcome);
     deferredPrompt = null;
     installBtn.classList.remove('show');
   });
@@ -503,9 +503,10 @@
       .catch(err => console.error('❌ SW error:', err));
   }
 
-  // ===== ПОЛНЫЙ ИГРОВОЙ КОД =====
+  // ==== ИГРА ====
   (function() {
     const canvas = document.getElementById('gameCanvas');
+    if (!canvas) { console.error('Canvas not found'); return; }
     const ctx = canvas.getContext('2d');
     const W = 900, H = 500;
     const GRAVITY = 0.65;
@@ -552,8 +553,8 @@
             cars: carsConfig.map(c => ({ unlocked: c.unlocked, upgradeLevels: c.upgradeLevels })),
             version: '4.0'
           }));
-          document.getElementById('saveIndicator').classList.add('show');
-          setTimeout(() => document.getElementById('saveIndicator').classList.remove('show'), 2000);
+          document.getElementById('saveIndicator')?.classList.add('show');
+          setTimeout(() => document.getElementById('saveIndicator')?.classList.remove('show'), 2000);
         } catch(e) {}
       };
       if (immediate) doSave();
@@ -575,7 +576,7 @@
           }
         });
         checkUnlock();
-      } catch(e) {}
+      } catch(e) { console.error('Load error:', e); }
     }
 
     function recalcStats(i) {
@@ -1039,6 +1040,7 @@
     function render() { ctx.clearRect(0, 0, W, H); drawSky(); drawTerrain(); drawCoins(); drawFuelCans(); drawParticles(); drawCar(); drawUI(); }
     function gameLoop() { updateCar(); updateParticles(); updateCamera(); render(); requestAnimationFrame(gameLoop); }
 
+    // Инициализация
     loadGameData();
     genTerrain(0);
     resetCar();
@@ -1046,6 +1048,7 @@
     resizeCanvas();
     gameLoop();
 
+    // Глобальные обработчики
     window.addEventListener('beforeunload', () => saveGameData(true));
     document.addEventListener('visibilitychange', () => { if (document.hidden) saveGameData(true); });
     document.addEventListener('fullscreenchange', handleFullscreenChange);
@@ -1056,6 +1059,7 @@
     window.addEventListener('keydown', e => { keys[e.code] = true; if (e.code === 'KeyR') resetCar(); if (e.code === 'KeyF') toggleFullscreen(); e.preventDefault(); });
     window.addEventListener('keyup', e => { keys[e.code] = false; e.preventDefault(); });
 
+    // Клики по кнопкам
     document.getElementById('fullscreenBtn').addEventListener('click', toggleFullscreen);
     document.getElementById('restartBtn').addEventListener('click', resetCar);
     document.getElementById('fuelRestartBtn').addEventListener('click', resetCar);
@@ -1069,6 +1073,8 @@
     document.getElementById('mobileGarageBtn').addEventListener('click', openGarage);
     document.getElementById('mobileResetBtn').addEventListener('click', () => document.getElementById('resetConfirmOverlay').classList.add('active'));
     document.getElementById('mobileLevelsToggle').addEventListener('click', toggleMobileLevels);
+
+    console.log('🚗 Игра запущена успешно');
   })();
 </script>
 </body>
