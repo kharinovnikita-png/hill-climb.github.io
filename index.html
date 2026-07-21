@@ -103,7 +103,7 @@
       touch-action: manipulation;
     }
 
-    /* Кнопка полноэкранного режима */
+    /* Кнопка полноэкранного режима – смещена */
     .fullscreen-btn {
       position: absolute;
       top: 35px;
@@ -117,6 +117,9 @@
       font-size: 0.8rem;
       z-index: 32;
       transition: all 0.2s;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      outline: none;
     }
     .fullscreen-btn:active { background: #ff4400; color: #000; }
 
@@ -158,6 +161,9 @@
       border-radius: 3px;
       cursor: pointer;
       font-size: 0.55rem;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      outline: none;
     }
     .mobile-top-panel button:active { background: #ff6600; }
 
@@ -187,15 +193,18 @@
       cursor: pointer;
       font-weight: bold;
       font-size: 6px;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      outline: none;
     }
     .mobile-levels-row button.active { background: #cc3300; color: #fff; }
     .mobile-levels-row button.endless { background: #220044; color: #cc88ff; border-color: #cc88ff; }
 
-    /* Сенсорные кнопки – теперь всегда видимы на мобильных */
+    /* Сенсорные кнопки – подняты выше, увеличены, видны на всех мобильных */
     .touch-controls { 
-      display: block;          /* по умолчанию показываем, если мобильное устройство */
+      display: none; 
       position: absolute;
-      bottom: 80px;            /* подняли выше, чтобы не перекрывать трассу */
+      bottom: 60px;
       left: 0;
       right: 0;
       z-index: 35;
@@ -227,6 +236,8 @@
       pointer-events: auto;
       backdrop-filter: blur(3px);
       -webkit-backdrop-filter: blur(3px);
+      user-select: none;
+      outline: none;
     }
     .touch-pedal:active { transform: scale(0.9); color: #fff; }
     .touch-pedal.gas { border-color: rgba(0,255,0,0.5); }
@@ -251,6 +262,8 @@
       transition: all 0.1s;
       backdrop-filter: blur(3px);
       -webkit-backdrop-filter: blur(3px);
+      user-select: none;
+      outline: none;
     }
     .touch-tilt-btn:active {
       background: rgba(255,150,0,0.7);
@@ -276,22 +289,25 @@
       z-index: 300;
       box-shadow: 0 0 20px rgba(255,68,0,0.7);
       display: none;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      outline: none;
     }
     .install-btn.show { display: block; }
 
-    /* Адаптивность */
-    @media (max-width: 768px) {
-      .desktop-panel, .desktop-levels, .desktop-info { display: none; }
-      .touch-controls { display: block; }  /* гарантированно показываем */
-      .mobile-top-panel { display: flex; }
-      .mobile-levels-row { display: flex; }
-      .fullscreen-btn {
-        top: 35px;
-        right: 10px;
-        padding: 8px 14px;
-        font-size: 0.9rem;
-      }
+    /* Адаптивность: показ мобильных элементов по классу .mobile */
+    .mobile .touch-controls { display: block; }
+    .mobile .mobile-top-panel { display: flex; }
+    .mobile .mobile-levels-row { display: flex; }
+    .mobile .desktop-panel, .mobile .desktop-levels, .mobile .desktop-info { display: none; }
+    .mobile .fullscreen-btn {
+      top: 35px;
+      right: 10px;
+      padding: 8px 14px;
+      font-size: 0.9rem;
     }
+
+    /* Для десктопа (без класса mobile) */
     @media (min-width: 769px) {
       .touch-controls { display: none; }
       .mobile-top-panel { display: none; }
@@ -328,6 +344,9 @@
     .game-overlay-btn {
       background: #ff4400; color: #000; border: none; padding: 10px 22px; font-size: 0.9rem;
       font-weight: bold; border-radius: 10px; cursor: pointer; margin: 3px; transition: all 0.2s;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      outline: none;
     }
     .game-overlay-btn.green { background: #008800; color: #fff; }
     .garage-overlay {
@@ -349,11 +368,17 @@
     .garage-close {
       background: #ff4400; color: #000; border: none; width: 28px; height: 28px;
       font-size: 0.9rem; font-weight: bold; border-radius: 50%; cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      outline: none;
     }
     .cars-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 15px; }
     .car-card {
       background: rgba(0,0,0,0.5); border: 2px solid #333; border-radius: 8px; padding: 8px;
       width: 130px; text-align: center; cursor: pointer; transition: all 0.3s; position: relative;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      outline: none;
     }
     .car-card.selected { border-color: #ff4400; box-shadow: 0 0 15px rgba(255,100,0,0.4); }
     .car-card.locked { opacity: 0.5; filter: grayscale(1); cursor: not-allowed; }
@@ -375,6 +400,9 @@
     .upgrade-btn {
       background: #ff4400; color: #000; border: none; padding: 4px 10px; font-weight: bold;
       border-radius: 5px; cursor: pointer; font-size: 0.65rem; white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      outline: none;
     }
     .upgrade-btn.maxed { background: #333; color: #666; cursor: default; }
     .garage-footer { display: flex; justify-content: space-between; align-items: center; color: #ffd700; font-weight: bold; flex-wrap: wrap; gap: 6px; font-size: 0.7rem; }
@@ -395,6 +423,9 @@
     .reset-overlay-btn {
       background: #ff4400; color: #000; border: none; padding: 8px 18px; font-size: 0.8rem;
       font-weight: bold; border-radius: 10px; cursor: pointer; margin: 3px;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      outline: none;
     }
   </style>
 </head>
@@ -504,19 +535,16 @@
     e.preventDefault();
     deferredPrompt = e;
     installBtn.classList.add('show');
-    console.log('beforeinstallprompt fired');
   });
   installBtn.addEventListener('click', async () => {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
-    console.log('Install outcome:', outcome);
     deferredPrompt = null;
     installBtn.classList.remove('show');
   });
   window.addEventListener('appinstalled', () => {
     installBtn.classList.remove('show');
-    console.log('PWA installed');
   });
 
   if ('serviceWorker' in navigator) {
@@ -550,10 +578,10 @@
 
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
                      (navigator.maxTouchPoints > 1 && window.innerWidth < 1024);
-
-    // Явно показываем сенсорные кнопки на мобильных, даже при изменении размера
+    
+    // Добавляем класс mobile для CSS
     if (isMobile) {
-      document.getElementById('touchControls').style.display = 'block';
+      document.getElementById('gameContainer').classList.add('mobile');
     }
 
     const carsConfig = [
@@ -664,10 +692,6 @@
         canvas.width = W; canvas.height = H;
       }
       setTimeout(resizeCanvas, 100);
-      // Принудительно показываем сенсорные кнопки после перехода в полноэкранный режим
-      if (isMobile) {
-        document.getElementById('touchControls').style.display = 'block';
-      }
     }
 
     function handleFullscreenChange() {
@@ -677,10 +701,6 @@
         isFullscreen = false;
         canvas.width = W; canvas.height = H;
         resizeCanvas();
-      }
-      // При выходе из полноэкранного режима тоже проверяем
-      if (isMobile) {
-        document.getElementById('touchControls').style.display = 'block';
       }
     }
 
@@ -1075,7 +1095,6 @@
     function render() { ctx.clearRect(0, 0, W, H); drawSky(); drawTerrain(); drawCoins(); drawFuelCans(); drawParticles(); drawCar(); drawUI(); }
     function gameLoop() { updateCar(); updateParticles(); updateCamera(); render(); requestAnimationFrame(gameLoop); }
 
-    // Инициализация
     loadGameData();
     genTerrain(0);
     resetCar();
@@ -1083,7 +1102,6 @@
     resizeCanvas();
     gameLoop();
 
-    // Глобальные обработчики
     window.addEventListener('beforeunload', () => saveGameData(true));
     document.addEventListener('visibilitychange', () => { if (document.hidden) saveGameData(true); });
     document.addEventListener('fullscreenchange', handleFullscreenChange);
@@ -1094,7 +1112,6 @@
     window.addEventListener('keydown', e => { keys[e.code] = true; if (e.code === 'KeyR') resetCar(); if (e.code === 'KeyF') toggleFullscreen(); e.preventDefault(); });
     window.addEventListener('keyup', e => { keys[e.code] = false; e.preventDefault(); });
 
-    // Клики по кнопкам
     document.getElementById('fullscreenBtn').addEventListener('click', toggleFullscreen);
     document.getElementById('restartBtn').addEventListener('click', resetCar);
     document.getElementById('fuelRestartBtn').addEventListener('click', resetCar);
