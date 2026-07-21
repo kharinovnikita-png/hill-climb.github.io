@@ -191,11 +191,11 @@
     .mobile-levels-row button.active { background: #cc3300; color: #fff; }
     .mobile-levels-row button.endless { background: #220044; color: #cc88ff; border-color: #cc88ff; }
 
-    /* Сенсорные кнопки – общие */
+    /* Сенсорные кнопки – теперь всегда видимы на мобильных */
     .touch-controls { 
-      display: none; 
+      display: block;          /* по умолчанию показываем, если мобильное устройство */
       position: absolute;
-      bottom: 60px;
+      bottom: 80px;            /* подняли выше, чтобы не перекрывать трассу */
       left: 0;
       right: 0;
       z-index: 35;
@@ -282,7 +282,7 @@
     /* Адаптивность */
     @media (max-width: 768px) {
       .desktop-panel, .desktop-levels, .desktop-info { display: none; }
-      .touch-controls { display: block; }
+      .touch-controls { display: block; }  /* гарантированно показываем */
       .mobile-top-panel { display: flex; }
       .mobile-levels-row { display: flex; }
       .fullscreen-btn {
@@ -304,13 +304,6 @@
         right: 5px;
         padding: 6px 12px;
         font-size: 0.8rem;
-      }
-    }
-
-    /* Дополнительный подъём кнопок в полноэкранном горизонтальном режиме */
-    @media (orientation: landscape) {
-      .game-container.fullscreen-mode .touch-controls {
-        bottom: 120px;  /* ещё выше, чтобы не перекрывались системными панелями */
       }
     }
 
@@ -558,6 +551,11 @@
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
                      (navigator.maxTouchPoints > 1 && window.innerWidth < 1024);
 
+    // Явно показываем сенсорные кнопки на мобильных, даже при изменении размера
+    if (isMobile) {
+      document.getElementById('touchControls').style.display = 'block';
+    }
+
     const carsConfig = [
       { id: 0, name: 'Джип', icon: '🚙', desc: 'Надёжный внедорожник', color: '#ff3300', unlocked: true,
         maxUpgrades: { engine: 4, tires: 4, fuel: 4 },
@@ -580,7 +578,7 @@
           localStorage.setItem('hcr_garage', JSON.stringify({
             totalCoins, currentCarIndex,
             cars: carsConfig.map(c => ({ unlocked: c.unlocked, upgradeLevels: c.upgradeLevels })),
-            version: '4.2'
+            version: '4.3'
           }));
           document.getElementById('saveIndicator')?.classList.add('show');
           setTimeout(() => document.getElementById('saveIndicator')?.classList.remove('show'), 2000);
@@ -666,6 +664,10 @@
         canvas.width = W; canvas.height = H;
       }
       setTimeout(resizeCanvas, 100);
+      // Принудительно показываем сенсорные кнопки после перехода в полноэкранный режим
+      if (isMobile) {
+        document.getElementById('touchControls').style.display = 'block';
+      }
     }
 
     function handleFullscreenChange() {
@@ -675,6 +677,10 @@
         isFullscreen = false;
         canvas.width = W; canvas.height = H;
         resizeCanvas();
+      }
+      // При выходе из полноэкранного режима тоже проверяем
+      if (isMobile) {
+        document.getElementById('touchControls').style.display = 'block';
       }
     }
 
