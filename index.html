@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, viewport-fit=cover, touch-action=manipulation">
   <title>Hill Climb Racing</title>
   
-  <!-- ВСТРОЕННЫЙ МАНИФЕСТ -->
   <script>
-    // Создаём манифест динамически
     const manifest = {
       name: "Hill Climb Racing",
       short_name: "Hill Climb",
@@ -21,7 +19,6 @@
         { src: "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><rect width="512" height="512" fill="#ff4400"/><text x="256" y="320" font-size="200" text-anchor="middle" fill="white">🚗</text></svg>'), sizes: "512x512", type: "image/svg+xml" }
       ]
     };
-    
     const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
     const manifestURL = URL.createObjectURL(blob);
     const link = document.createElement('link');
@@ -147,13 +144,14 @@
     }
     .fullscreen-btn:active { background: #ff4400; color: #000; }
 
+    /* Мобильная верхняя панель */
     .mobile-top-panel {
       display: none;
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
-      background: rgba(0,0,0,0.8);
+      background: rgba(0,0,0,0.85);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       padding: 5px 8px;
@@ -174,7 +172,7 @@
       flex-wrap: wrap;
     }
     .mobile-top-panel .panel-row span { color: #ffd700; }
-    .mobile-top-panel .panel-btns { display: flex; gap: 3px; }
+    .mobile-top-panel .panel-btns { display: flex; gap: 3px; align-items: center; }
     .mobile-top-panel button {
       background: rgba(255,68,0,0.7);
       color: #000;
@@ -187,8 +185,25 @@
       -webkit-tap-highlight-color: transparent;
       user-select: none;
       outline: none;
+      white-space: nowrap;
     }
     .mobile-top-panel button:active { background: #ff6600; }
+    
+    /* Кнопка установки в верхней панели */
+    .install-btn-top {
+      background: #ff4400 !important;
+      color: #fff !important;
+      padding: 3px 8px !important;
+      font-size: 0.6rem !important;
+      animation: pulse 2s infinite;
+      display: none;
+    }
+    .install-btn-top.show { display: inline-block !important; }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 5px rgba(255,68,0,0.7); }
+      50% { box-shadow: 0 0 15px rgba(255,68,0,1); }
+      100% { box-shadow: 0 0 5px rgba(255,68,0,0.7); }
+    }
 
     .mobile-levels-row {
       display: none;
@@ -222,10 +237,11 @@
     .mobile-levels-row button.active { background: #cc3300; color: #fff; }
     .mobile-levels-row button.endless { background: #220044; color: #cc88ff; border-color: #cc88ff; }
 
+    /* Сенсорные кнопки управления */
     .touch-controls { 
       display: none; 
       position: absolute;
-      bottom: 60px;
+      bottom: 20px;
       left: 0;
       right: 0;
       z-index: 35;
@@ -242,10 +258,10 @@
       width: 70px;
       height: 70px;
       border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.4);
+      border: 3px solid rgba(255,255,255,0.5);
       background: rgba(0,0,0,0.5);
       color: rgba(255,255,255,0.9);
-      font-size: 26px;
+      font-size: 28px;
       font-weight: bold;
       display: flex;
       align-items: center;
@@ -259,12 +275,13 @@
       -webkit-backdrop-filter: blur(3px);
       user-select: none;
       outline: none;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
     }
-    .touch-pedal:active { transform: scale(0.9); color: #fff; }
-    .touch-pedal.gas { border-color: rgba(0,255,0,0.5); }
-    .touch-pedal.gas:active { background: rgba(0,180,0,0.7); border-color: rgba(0,255,0,0.8); }
-    .touch-pedal.brake { border-color: rgba(255,0,0,0.5); }
-    .touch-pedal.brake:active { background: rgba(180,0,0,0.7); border-color: rgba(255,0,0,0.8); }
+    .touch-pedal:active { transform: scale(0.9); }
+    .touch-pedal.gas { border-color: rgba(0,255,0,0.6); }
+    .touch-pedal.gas:active { background: rgba(0,180,0,0.7); border-color: rgba(0,255,0,0.9); }
+    .touch-pedal.brake { border-color: rgba(255,0,0,0.6); }
+    .touch-pedal.brake:active { background: rgba(180,0,0,0.7); border-color: rgba(255,0,0,0.9); }
     .touch-tilt-group { display: flex; gap: 12px; pointer-events: auto; }
     .touch-tilt-btn {
       width: 50px;
@@ -285,41 +302,13 @@
       -webkit-backdrop-filter: blur(3px);
       user-select: none;
       outline: none;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
     }
     .touch-tilt-btn:active {
       background: rgba(255,150,0,0.7);
       border-color: rgba(255,150,0,0.9);
       transform: scale(0.9);
       color: #fff;
-    }
-
-    /* Кнопка установки - всегда видна на мобильных */
-    .install-btn {
-      position: fixed;
-      bottom: 120px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #ff4400;
-      color: #000;
-      border: none;
-      padding: 14px 28px;
-      font-size: 1rem;
-      font-weight: bold;
-      border-radius: 12px;
-      cursor: pointer;
-      z-index: 300;
-      box-shadow: 0 0 20px rgba(255,68,0,0.7);
-      display: none;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-      outline: none;
-      animation: pulse 2s infinite;
-    }
-    .install-btn.show { display: block; }
-    @keyframes pulse {
-      0% { box-shadow: 0 0 20px rgba(255,68,0,0.7); }
-      50% { box-shadow: 0 0 40px rgba(255,68,0,1); }
-      100% { box-shadow: 0 0 20px rgba(255,68,0,0.7); }
     }
 
     /* Показ мобильных элементов */
@@ -466,6 +455,7 @@
         <button id="mobileGarageBtn">🔧</button>
         <button id="mobileResetBtn">🗑️</button>
         <button id="mobileLevelsToggle">📋</button>
+        <button class="install-btn-top" id="installBtnTop">📲 Установить</button>
       </div>
     </div>
     <div class="mobile-levels-row" id="mobileLevelsRow"></div>
@@ -534,80 +524,60 @@
   </div>
 </div>
 
-<button id="installBtn" class="install-btn">📲 Установить игру</button>
-
 <script>
   // ===== PWA — ВСТРОЕННЫЙ SERVICE WORKER =====
   if ('serviceWorker' in navigator) {
     const swCode = `
       const CACHE_NAME = 'hcr-v3';
-      const ASSETS = [location.href];
-      
       self.addEventListener('install', event => {
-        event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
+        event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll([location.href])));
         self.skipWaiting();
       });
-      
       self.addEventListener('activate', event => {
         event.waitUntil(caches.keys().then(keys => Promise.all(keys.map(key => {
           if (key !== CACHE_NAME) return caches.delete(key);
         }))));
         self.clients.claim();
       });
-      
       self.addEventListener('fetch', event => {
-        event.respondWith(
-          caches.match(event.request).then(resp => resp || fetch(event.request).then(response => {
-            if (!response || response.status !== 200 || response.type !== 'basic') return response;
-            const responseToCache = response.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(event.request, responseToCache));
-            return response;
-          }))
-        );
+        event.respondWith(caches.match(event.request).then(resp => resp || fetch(event.request)));
       });
     `;
-    
     const swBlob = new Blob([swCode], { type: 'application/javascript' });
     const swURL = URL.createObjectURL(swBlob);
-    
     navigator.serviceWorker.register(swURL, { scope: '/' })
-      .then(reg => console.log('✅ SW registered:', reg.scope))
+      .then(reg => console.log('✅ SW registered'))
       .catch(err => console.error('❌ SW error:', err));
   }
 
-  // ===== PWA — КНОПКА УСТАНОВКИ =====
+  // ===== PWA — КНОПКА УСТАНОВКИ (в верхней панели) =====
   let deferredPrompt;
-  const installBtn = document.getElementById('installBtn');
+  const installBtnTop = document.getElementById('installBtnTop');
   
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    installBtn.classList.add('show');
-    console.log('✅ beforeinstallprompt fired');
+    installBtnTop.classList.add('show');
   });
   
-  installBtn.addEventListener('click', async () => {
+  installBtnTop.addEventListener('click', async () => {
     if (deferredPrompt) {
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
-      console.log('Install outcome:', outcome);
       deferredPrompt = null;
     } else {
-      // Если стандартный способ не сработал, показываем инструкцию
-      alert('Чтобы установить игру:\n1. Нажмите кнопку "Поделиться" в браузере\n2. Выберите "На экран «Домой»"\n3. Нажмите "Добавить"');
+      alert('Добавьте сайт на главный экран через меню браузера');
     }
-    installBtn.classList.remove('show');
+    installBtnTop.classList.remove('show');
   });
   
   window.addEventListener('appinstalled', () => {
-    installBtn.classList.remove('show');
-    console.log('PWA installed');
+    installBtnTop.classList.remove('show');
   });
   
-  // Показываем кнопку установки через 3 секунды, если beforeinstallprompt не сработал
   setTimeout(() => {
     if (!deferredPrompt && !window.matchMedia('(display-mode: standalone)').matches) {
-      installBtn.classList.add('show');
+      installBtnTop.classList.add('show');
     }
   }, 3000);
 
@@ -661,7 +631,7 @@
           localStorage.setItem('hcr_garage', JSON.stringify({
             totalCoins, currentCarIndex,
             cars: carsConfig.map(c => ({ unlocked: c.unlocked, upgradeLevels: c.upgradeLevels })),
-            version: '5.0'
+            version: '5.1'
           }));
           document.getElementById('saveIndicator')?.classList.add('show');
           setTimeout(() => document.getElementById('saveIndicator')?.classList.remove('show'), 2000);
