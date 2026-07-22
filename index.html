@@ -275,13 +275,13 @@
     /* Кнопка установки PWA */
     .install-btn {
       position: fixed;
-      bottom: 20px;
+      bottom: 100px;
       left: 50%;
       transform: translateX(-50%);
       background: #ff4400;
       color: #000;
       border: none;
-      padding: 12px 24px;
+      padding: 14px 28px;
       font-size: 1rem;
       font-weight: bold;
       border-radius: 12px;
@@ -292,8 +292,14 @@
       -webkit-tap-highlight-color: transparent;
       user-select: none;
       outline: none;
+      animation: pulse 2s infinite;
     }
     .install-btn.show { display: block; }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 20px rgba(255,68,0,0.7); }
+      50% { box-shadow: 0 0 40px rgba(255,68,0,1); }
+      100% { box-shadow: 0 0 20px rgba(255,68,0,0.7); }
+    }
 
     /* Показ мобильных элементов через JS-класс */
     .mobile .touch-controls { display: block; }
@@ -532,12 +538,15 @@
     console.log('✅ beforeinstallprompt fired');
   });
   installBtn.addEventListener('click', async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    console.log('Install outcome:', outcome);
-    deferredPrompt = null;
-    installBtn.classList.remove('show');
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log('Install outcome:', outcome);
+      deferredPrompt = null;
+      installBtn.classList.remove('show');
+    } else {
+      alert('Функция установки недоступна. Попробуйте открыть сайт в браузере Chrome.');
+    }
   });
   window.addEventListener('appinstalled', () => {
     installBtn.classList.remove('show');
@@ -579,7 +588,6 @@
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
                      (navigator.maxTouchPoints > 1 && window.innerWidth < 1024);
     
-    // Добавляем класс mobile для CSS
     if (isMobile) {
       document.getElementById('gameContainer').classList.add('mobile');
     }
@@ -606,7 +614,7 @@
           localStorage.setItem('hcr_garage', JSON.stringify({
             totalCoins, currentCarIndex,
             cars: carsConfig.map(c => ({ unlocked: c.unlocked, upgradeLevels: c.upgradeLevels })),
-            version: '4.4'
+            version: '4.5'
           }));
           document.getElementById('saveIndicator')?.classList.add('show');
           setTimeout(() => document.getElementById('saveIndicator')?.classList.remove('show'), 2000);
@@ -981,7 +989,12 @@
     }
 
     function updateParticles() { for (let i = particles.length - 1; i >= 0; i--) { const p = particles[i]; p.x += p.vx; p.y += p.vy; p.vy += 0.2; p.life--; if (p.life <= 0) particles.splice(i, 1); } }
-    function updateCamera() { cameraX += (car.x - W * 0.35 - cameraX) * 0.06; cameraX = Math.max(0, cameraX); }
+    function updateCamera() { 
+      // Камера всегда следует за машиной с небольшим смещением
+      const targetX = car.x - W * 0.35;
+      cameraX += (targetX - cameraX) * 0.08;
+      cameraX = Math.max(0, cameraX);
+    }
 
     function drawSky() {
       const cols = { night: ['#010104','#030308','#060610'], mars: ['#200400','#3a0a00','#5a1500'], hell: ['#020000','#050000','#0a0000'], volcano: ['#0a0200','#180500','#2a0a00'], icy: ['#607080','#708090','#8098a0'], sandy: ['#805020','#906030','#a07040'] }[(levelConfig || {}).terrain] || ['#1a3050','#2a4060','#3a5070'];
