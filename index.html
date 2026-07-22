@@ -103,7 +103,7 @@
       touch-action: manipulation;
     }
 
-    /* Кнопка полноэкранного режима – смещена */
+    /* Кнопка полноэкранного режима */
     .fullscreen-btn {
       position: absolute;
       top: 35px;
@@ -200,7 +200,7 @@
     .mobile-levels-row button.active { background: #cc3300; color: #fff; }
     .mobile-levels-row button.endless { background: #220044; color: #cc88ff; border-color: #cc88ff; }
 
-    /* Сенсорные кнопки – подняты выше, увеличены, видны на всех мобильных */
+    /* Сенсорные кнопки */
     .touch-controls { 
       display: none; 
       position: absolute;
@@ -529,7 +529,7 @@
     e.preventDefault();
     deferredPrompt = e;
     installBtn.classList.add('show');
-    console.log('beforeinstallprompt fired');
+    console.log('✅ beforeinstallprompt fired');
   });
   installBtn.addEventListener('click', async () => {
     if (!deferredPrompt) return;
@@ -544,10 +544,13 @@
     console.log('PWA installed');
   });
 
+  // Service Worker
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js')
-      .then(() => console.log('✅ SW registered'))
-      .catch(err => console.error('❌ SW error:', err));
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(registration => console.log('✅ SW registered:', registration.scope))
+        .catch(err => console.error('❌ SW error:', err));
+    });
   }
 
   // ==== ИГРА ====
@@ -603,7 +606,7 @@
           localStorage.setItem('hcr_garage', JSON.stringify({
             totalCoins, currentCarIndex,
             cars: carsConfig.map(c => ({ unlocked: c.unlocked, upgradeLevels: c.upgradeLevels })),
-            version: '4.3'
+            version: '4.4'
           }));
           document.getElementById('saveIndicator')?.classList.add('show');
           setTimeout(() => document.getElementById('saveIndicator')?.classList.remove('show'), 2000);
